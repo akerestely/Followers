@@ -1,13 +1,8 @@
 #include "MainGame.h"
-#include <iostream>
+
 #include <GL\glew.h>
 
-void fatalError(char* msg)
-{
-	std::cout<<msg<<'\n';
-	system("pause");
-	SDL_Quit();
-}
+#include "Errors.h"
 
 MainGame::MainGame(void)
 {
@@ -20,6 +15,8 @@ MainGame::MainGame(void)
 void MainGame::Run()
 {
 	initSystems();
+
+	sprite.Init(-0.5f,-0.5f,1.0f,1.0f);
 
 	gameLoop();
 }
@@ -42,8 +39,17 @@ void MainGame::initSystems()
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	glClearColor(0.0,0.0,0.0,1);
+	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
+
+	initShaders();
 }
+void MainGame::initShaders()
+{
+	colorProgram.CompileShaders("shaders/colorShading.vert","shaders/colorShading.frag");
+	colorProgram.AddAttribute("vertexPosition");
+	colorProgram.LinkShader();
+}
+
 void MainGame::gameLoop()
 {
 	while(gameState != EXIT)
@@ -52,6 +58,7 @@ void MainGame::gameLoop()
 		renderScene();
 	}
 }
+
 void MainGame::processInput()
 {
 	SDL_Event evnt;
@@ -65,12 +72,19 @@ void MainGame::processInput()
 		}
 	}
 }
+
 void MainGame::renderScene()
 {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//draw here
+	colorProgram.Use();
+
+	sprite.Draw();
+
+	colorProgram.UnUse();
 
 	SDL_GL_SwapWindow(window);
 }
