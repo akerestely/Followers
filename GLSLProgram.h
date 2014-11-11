@@ -14,6 +14,8 @@ public:
 
 	void AddAttribute(const char* attribName);
 
+	GLuint GetUniformLocation( const char* uniformName);
+
 	void Use();
 	void UnUse();
 private:

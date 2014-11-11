@@ -4,12 +4,13 @@
 
 #include "Errors.h"
 
-MainGame::MainGame(void)
+MainGame::MainGame(void) :
+	window(nullptr),
+	screenWidth(800),
+	screenHeight(600),
+	gameState(PLAY),
+	time(0)
 {
-	window = nullptr;
-	screenWidth=800;
-	screenHeight=640;
-	gameState=PLAY;
 }
 
 void MainGame::Run()
@@ -47,6 +48,7 @@ void MainGame::initShaders()
 {
 	colorProgram.CompileShaders("shaders/colorShading.vert","shaders/colorShading.frag");
 	colorProgram.AddAttribute("vertexPosition");
+	colorProgram.AddAttribute("vertexColor");
 	colorProgram.LinkShader();
 }
 
@@ -55,6 +57,7 @@ void MainGame::gameLoop()
 	while(gameState != EXIT)
 	{
 		processInput();
+		time += 0.01;
 		renderScene();
 	}
 }
@@ -81,6 +84,9 @@ void MainGame::renderScene()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	colorProgram.Use();
+
+	GLuint timeLocation = colorProgram.GetUniformLocation("time");
+	glUniform1f(timeLocation,time);
 
 	sprite.Draw();
 
