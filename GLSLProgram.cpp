@@ -27,15 +27,14 @@ void GLSLProgram::CompileShaders(const char* vertexShaderFilePath, const char* f
 
 	compileShader(vertexShaderFilePath, vertexShaderId);
 	compileShader(fragmentShaderFilePath, fragmentShaderId);
+
+	//Vertex and fragment shaders are successfully compiled.
+	//Get a program object.
+	programId = glCreateProgram();
 }
 
 void GLSLProgram::LinkShader()
 {
-	//Vertex and fragment shaders are successfully compiled.
-	//Now time to link them together into a program.
-	//Get a program object.
-	programId = glCreateProgram();
-
 	//Attach our shaders to our program
 	glAttachShader(programId, vertexShaderId);
 	glAttachShader(programId, fragmentShaderId);

@@ -7,4 +7,5 @@ void fatalError(char* msg)
 	std::cout<<msg<<'\n';
 	system("pause");
 	SDL_Quit();
+	exit(1);
 }
