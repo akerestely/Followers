@@ -3,8 +3,9 @@
 #include <sdl/SDL.h>
 #undef main
 
-#include "Sprite.h"
 #include "GLSLProgram.h"
+#include "Sprite.h"
+#include "GLTexture.h"
 
 enum GameState {PLAY,EXIT}; 
 
@@ -20,14 +21,19 @@ private:
 	void gameLoop();
 	void processInput();
 	void renderScene();
+	void calculateFPS();
 
 	SDL_Window *window;
 	int screenWidth,screenHeight;
 	GameState gameState;
 
-	Sprite sprite;
+	Sprite sprite[3];
 
 	GLSLProgram colorProgram;
+
+	float fps;
+	float maxFps;
+	float frameTime;
 
 	float time;
 };

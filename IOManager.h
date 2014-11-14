@@ -5,6 +5,6 @@
 class IOManager
 {
 public:
-	static bool ReadFileToBuffer(char* filepath, std::vector<char>& buffer);
+	static bool ReadFileToBuffer(char* filepath, std::vector<unsigned char>& buffer);
 };
 
