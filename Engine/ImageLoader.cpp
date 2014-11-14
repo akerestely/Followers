@@ -4,7 +4,9 @@
 #include "IOManager.h"
 #include "Errors.h"
 
-GLTexture ImageLoader::LoadPNG(char* filePath)
+namespace Engine
+{
+	GLTexture ImageLoader::LoadPNG(char* filePath)
 {
 	GLTexture texture = {};
 
@@ -40,4 +42,5 @@ GLTexture ImageLoader::LoadPNG(char* filePath)
 	texture.height=height;
 
 	return texture;
+}
 }

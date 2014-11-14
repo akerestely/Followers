@@ -1,11 +1,11 @@
 #pragma once
 
-#include <sdl/SDL.h>
-#undef main
+#include <Engine/Engine.h>
+#include <Engine/Window.h>
+#include <Engine/GLSLProgram.h>
+#include <Engine/GLTexture.h>
 
-#include "GLSLProgram.h"
-#include "Sprite.h"
-#include "GLTexture.h"
+#include <Engine/Sprite.h>
 
 enum GameState {PLAY,EXIT}; 
 
@@ -23,13 +23,13 @@ private:
 	void renderScene();
 	void calculateFPS();
 
-	SDL_Window *window;
+	Engine::Window window;
 	int screenWidth,screenHeight;
 	GameState gameState;
 
-	Sprite sprite[3];
+	Engine::Sprite sprite[3];
 
-	GLSLProgram colorProgram;
+	Engine::GLSLProgram colorProgram;
 
 	float fps;
 	float maxFps;

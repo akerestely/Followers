@@ -1,15 +1,12 @@
 #include "MainGame.h"
 
-#include <GL\glew.h>
+#include <Engine/Errors.h>
 
-#include "Errors.h"
-
-#include "ImageLoader.h"
+#include <Engine/ImageLoader.h>
 //remove
 #include <iostream>
 
 MainGame::MainGame(void) :
-	window(nullptr),
 	screenWidth(800),
 	screenHeight(600),
 	gameState(PLAY),
@@ -31,29 +28,9 @@ void MainGame::Run()
 
 void MainGame::initSystems()
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
+	Engine::Init();
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	window = SDL_CreateWindow("Followers",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,screenWidth,screenHeight,SDL_WINDOW_OPENGL);
-
-	if(window==nullptr)
-		fatalError("SDL window could not be loaded");
-
-	SDL_GLContext glContex = SDL_GL_CreateContext(window);
-	if(glContex == nullptr)
-		fatalError("SQL_GL context could not be created");
-
-	GLenum glewError=glewInit();
-	if(glewError != GLEW_OK)
-		fatalError("Could not initialize glew!");
-
-	printf("***   OpenGl Version: %s   ***\n", glGetString(GL_VERSION));
-
-	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
-
-	//set v-sync
-	//SDL_GL_SetSwapInterval(1);
+	window.Create("Followers", screenWidth, screenHeight, 0);
 
 	initShaders();
 }
@@ -94,6 +71,8 @@ void MainGame::processInput()
 		case SDL_QUIT:
 			gameState=EXIT;
 			break;
+		/*case SDL_KEYDOWN:
+			evnt.key*/
 		}
 	}
 }
@@ -120,7 +99,7 @@ void MainGame::renderScene()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();
 
-	SDL_GL_SwapWindow(window);
+	window.SwappBuffer();
 }
 
 void MainGame::calculateFPS()

@@ -6,16 +6,18 @@
 
 #include "Errors.h"
 
-GLSLProgram::GLSLProgram(void): 
+namespace Engine
+{
+	GLSLProgram::GLSLProgram(void): 
 	numAtrtrib(0), programId(0), vertexShaderId(0), fragmentShaderId(0)
 {
 }
 
-GLSLProgram::~GLSLProgram(void)
+	GLSLProgram::~GLSLProgram(void)
 {
 }
 
-void GLSLProgram::CompileShaders(const char* vertexShaderFilePath, const char* fragmentShaderFilePath)
+	void GLSLProgram::CompileShaders(const char* vertexShaderFilePath, const char* fragmentShaderFilePath)
 {
 	vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 	if(!vertexShaderId)
@@ -33,7 +35,7 @@ void GLSLProgram::CompileShaders(const char* vertexShaderFilePath, const char* f
 	programId = glCreateProgram();
 }
 
-void GLSLProgram::LinkShader()
+	void GLSLProgram::LinkShader()
 {
 	//Attach our shaders to our program
 	glAttachShader(programId, vertexShaderId);
@@ -76,12 +78,12 @@ void GLSLProgram::LinkShader()
 	glDeleteShader(fragmentShaderId);
 }
 
-void GLSLProgram::AddAttribute(const char* attribName)
+	void GLSLProgram::AddAttribute(const char* attribName)
 {
 	glBindAttribLocation(programId, numAtrtrib++, attribName);
 }
 
-GLint GLSLProgram::GetUniformLocation( const char* uniformName )
+	GLint GLSLProgram::GetUniformLocation( const char* uniformName )
 {
 	GLint location=glGetUniformLocation(programId, uniformName);
 	if(location == GL_INVALID_INDEX)
@@ -90,20 +92,20 @@ GLint GLSLProgram::GetUniformLocation( const char* uniformName )
 }
 
 
-void GLSLProgram::Use()
+	void GLSLProgram::Use()
 {
 	glUseProgram(programId);
 	for(int i=0;i<numAtrtrib;i++)
 		glEnableVertexAttribArray(i);
 }
-void GLSLProgram::UnUse()
+	void GLSLProgram::UnUse()
 {
 	glUseProgram(0);
 	for(int i=0;i<numAtrtrib;i++)
 		glDisableVertexAttribArray(i);
 }
 
-void GLSLProgram::compileShader(const char* filePath, GLuint id)
+	void GLSLProgram::compileShader(const char* filePath, GLuint id)
 {
 	std::ifstream file(filePath);
 	if(file.fail())
@@ -145,4 +147,5 @@ void GLSLProgram::compileShader(const char* filePath, GLuint id)
 
 		return;
 	}
+}
 }
