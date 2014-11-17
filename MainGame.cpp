@@ -13,15 +13,12 @@ MainGame::MainGame(void) :
 	time(0),
 	maxFps(60)
 {
+	camera.Init(screenWidth,screenHeight);
 }
 
 void MainGame::Run()
 {
 	initSystems();
-
-	sprite[0].Init(-1.0f,-0.5f,1.0f,1.0f,"Textures/PNG/HearthEnemy1.png");
-	sprite[1].Init(-0.0f,-0.5f,1.0f,1.0f,"Textures/PNG/HearthEnemy1.png");
-	sprite[2].Init(-0.5f,-0.5f,1.0f,1.0f,"Textures/PNG/HearthEnemy1.png");
 
 	gameLoop();
 }
@@ -33,6 +30,8 @@ void MainGame::initSystems()
 	window.Create("Followers", screenWidth, screenHeight, 0);
 
 	initShaders();
+
+	spriteBatch.Init();
 }
 void MainGame::initShaders()
 {
@@ -51,9 +50,12 @@ void MainGame::gameLoop()
 
 		processInput();
 		time += 0.01;
+
+		camera.Update();
 		renderScene();
-		calculateFPS();
-		std::cout<<fps<<"\n";
+
+		//calculateFPS();
+		//std::cout<<fps<<"\n";
 
 		float frameTicks = SDL_GetTicks() - startTicks;
 		if(1000.0f / maxFps > frameTicks)
@@ -64,6 +66,8 @@ void MainGame::gameLoop()
 void MainGame::processInput()
 {
 	SDL_Event evnt;
+	const float CAMERA_SPEED = 20.0f;
+	const float SCALE_SPEED = 0.1f;
 	while(SDL_PollEvent(&evnt))
 	{
 		switch(evnt.type)
@@ -71,8 +75,29 @@ void MainGame::processInput()
 		case SDL_QUIT:
 			gameState=EXIT;
 			break;
-		/*case SDL_KEYDOWN:
-			evnt.key*/
+		case SDL_KEYDOWN:
+			switch (evnt.key.keysym.sym)
+			{
+			case SDLK_w:
+				camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+				break;
+			case SDLK_s:
+				camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+				break;
+			case SDLK_a:
+				camera.SetPosition(camera.GetPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+				break;
+			case SDLK_d:
+				camera.SetPosition(camera.GetPosition() + glm::vec2(CAMERA_SPEED, -0.0f));
+				break;
+			case SDLK_q:
+				camera.SetScale(camera.GetScale() + SCALE_SPEED);
+				break;	 
+			case SDLK_e: 
+				camera.SetScale(camera.GetScale() - SCALE_SPEED);
+				break;
+			}
+			break;
 		}
 	}
 }
@@ -93,8 +118,31 @@ void MainGame::renderScene()
 	GLint timeLocation = colorProgram.GetUniformLocation("time");
 	glUniform1f(timeLocation, time);
 
-	for(int i=0;i<3;i++)
-		sprite[i].Draw();
+	//set the camera matrix
+	GLint pLocation = colorProgram.GetUniformLocation("P");
+	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
+	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+
+	spriteBatch.Begin();
+
+	glm::vec4 pos(0,0,50,50);
+	glm::vec4 uv(0,0,1,1);
+	static Engine::GLTexture texture = Engine::ResourceMngr::GetTexture("Textures/PNG/HearthEnemy1.png");
+	Engine::Color color;
+	color.r=255;
+	color.g=255;
+	color.b=255;
+	color.a=255;
+
+	for(int i=0; i<100; i++)
+	{
+		spriteBatch.Draw(pos,uv,texture.id,0,color);
+		spriteBatch.Draw(pos + glm::vec4(50,0,0,0),uv,texture.id,0,color);
+	}
+
+	spriteBatch.End();
+	spriteBatch.RenderBatches();
+
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();

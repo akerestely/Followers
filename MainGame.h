@@ -4,8 +4,10 @@
 #include <Engine/Window.h>
 #include <Engine/GLSLProgram.h>
 #include <Engine/GLTexture.h>
+#include <Engine/Camera2D.h>
 
 #include <Engine/Sprite.h>
+#include "Engine/SpriteBatch.h"
 
 enum GameState {PLAY,EXIT}; 
 
@@ -27,9 +29,10 @@ private:
 	int screenWidth,screenHeight;
 	GameState gameState;
 
-	Engine::Sprite sprite[3];
-
 	Engine::GLSLProgram colorProgram;
+	Engine::Camera2D camera;
+
+	Engine::SpriteBatch spriteBatch;
 
 	float fps;
 	float maxFps;
