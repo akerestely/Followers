@@ -34,6 +34,7 @@ void MainGame::initSystems()
 	spriteBatch.Init();
 	fpsLimiter.Init(maxFps);
 }
+
 void MainGame::initShaders()
 {
 	colorProgram.CompileShaders("shaders/colorShading.vert","shaders/colorShading.frag");
@@ -99,17 +100,12 @@ void MainGame::renderScene()
 {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	colorProgram.Use();
 	glActiveTexture(GL_TEXTURE0);
 
 	GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
 	glUniform1i(textureLocation, 0);
-
-	GLint timeLocation = colorProgram.GetUniformLocation("time");
-	glUniform1f(timeLocation, time);
 
 	//set the camera matrix
 	GLint pLocation = colorProgram.GetUniformLocation("P");
