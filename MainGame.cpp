@@ -32,6 +32,7 @@ void MainGame::initSystems()
 	initShaders();
 
 	spriteBatch.Init();
+	fpsLimiter.Init(maxFps);
 }
 void MainGame::initShaders()
 {
@@ -46,7 +47,7 @@ void MainGame::gameLoop()
 {
 	while(gameState != EXIT)
 	{
-		float startTicks = SDL_GetTicks();
+		fpsLimiter.Begin();
 
 		processInput();
 		time += 0.01;
@@ -54,19 +55,15 @@ void MainGame::gameLoop()
 		camera.Update();
 		renderScene();
 
-		//calculateFPS();
-		//std::cout<<fps<<"\n";
-
-		float frameTicks = SDL_GetTicks() - startTicks;
-		if(1000.0f / maxFps > frameTicks)
-			SDL_Delay(1000.0f / maxFps - frameTicks);
+		fps = fpsLimiter.End();
+		std::cout<<fps<<"\n";
 	}
 }
 
 void MainGame::processInput()
 {
 	SDL_Event evnt;
-	const float CAMERA_SPEED = 20.0f;
+	const float CAMERA_SPEED = 5.0f;
 	const float SCALE_SPEED = 0.1f;
 	while(SDL_PollEvent(&evnt))
 	{
@@ -76,30 +73,26 @@ void MainGame::processInput()
 			gameState=EXIT;
 			break;
 		case SDL_KEYDOWN:
-			switch (evnt.key.keysym.sym)
-			{
-			case SDLK_w:
-				camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-				break;
-			case SDLK_s:
-				camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-				break;
-			case SDLK_a:
-				camera.SetPosition(camera.GetPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-				break;
-			case SDLK_d:
-				camera.SetPosition(camera.GetPosition() + glm::vec2(CAMERA_SPEED, -0.0f));
-				break;
-			case SDLK_q:
-				camera.SetScale(camera.GetScale() + SCALE_SPEED);
-				break;	 
-			case SDLK_e: 
-				camera.SetScale(camera.GetScale() - SCALE_SPEED);
-				break;
-			}
+			inputManager.PressKey(evnt.key.keysym.sym);
+			break;
+		case SDL_KEYUP:
+			inputManager.ReleaseKey(evnt.key.keysym.sym);
 			break;
 		}
 	}
+
+	if(inputManager.IsKeyPressed(SDLK_w))
+		camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+	if(inputManager.IsKeyPressed(SDLK_s))
+		camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+	if(inputManager.IsKeyPressed(SDLK_a))
+		camera.SetPosition(camera.GetPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+	if(inputManager.IsKeyPressed(SDLK_d))
+		camera.SetPosition(camera.GetPosition() + glm::vec2(CAMERA_SPEED, -0.0f));
+	if(inputManager.IsKeyPressed(SDLK_q))
+		camera.SetScale(camera.GetScale() + SCALE_SPEED);
+	if(inputManager.IsKeyPressed(SDLK_e))
+		camera.SetScale(camera.GetScale() - SCALE_SPEED);
 }
 
 void MainGame::renderScene()
@@ -148,40 +141,6 @@ void MainGame::renderScene()
 	colorProgram.UnUse();
 
 	window.SwappBuffer();
-}
-
-void MainGame::calculateFPS()
-{
-	static const int NUM_SAMPLES = 10;
-	static float frameTimes[NUM_SAMPLES];
-	static int currentFrame = 0;
-
-	static float prevTicks = SDL_GetTicks();
-
-	float currentTicks;
-	currentTicks = SDL_GetTicks();
-
-	frameTime = currentTicks - prevTicks;
-	frameTimes[currentFrame % NUM_SAMPLES] = frameTime;
-
-	prevTicks = currentTicks;
-
-	int count;
-	currentFrame++;
-	if(currentFrame < NUM_SAMPLES)
-		count = currentFrame;
-	else
-		count = NUM_SAMPLES;
-
-	float frameTimeAverage = 0;
-	for(int i=0; i<count; i++)
-		frameTimeAverage += frameTimes[i];
-	frameTimeAverage /= count;
-
-	if(frameTimeAverage>0)
-		fps = 1000.0f / frameTimeAverage;
-	else
-		fps = 0;
 }
 
 MainGame::~MainGame(void)
