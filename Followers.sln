@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Followers", "Followers.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{B84FB94B-72BE-4E25-AA49-DE78112109CD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZombieGame", "ZombieGame\ZombieGame.vcxproj", "{B97676BC-2583-4A4E-80A7-64672345C3A5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B84FB94B-72BE-4E25-AA49-DE78112109CD} = {B84FB94B-72BE-4E25-AA49-DE78112109CD}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -38,6 +43,16 @@ Global
 		{B84FB94B-72BE-4E25-AA49-DE78112109CD}.Release|Win32.ActiveCfg = Release|Win32
 		{B84FB94B-72BE-4E25-AA49-DE78112109CD}.Release|Win32.Build.0 = Release|Win32
 		{B84FB94B-72BE-4E25-AA49-DE78112109CD}.Release|x86.ActiveCfg = Release|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Debug|Win32.Build.0 = Debug|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Debug|x86.ActiveCfg = Debug|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Release|Win32.ActiveCfg = Release|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Release|Win32.Build.0 = Release|Win32
+		{B97676BC-2583-4A4E-80A7-64672345C3A5}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
