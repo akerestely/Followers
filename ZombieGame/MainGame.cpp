@@ -15,7 +15,7 @@
 const float HUMAN_SPEED = 1.0f;
 const float ZOMBIE_SPEED = 1.3f;
 
-MainGame::MainGame(): screenWidth(1000), screenHeight(800), gameState(PLAY), player(nullptr)
+MainGame::MainGame(): screenWidth(1000), screenHeight(800), gameState(PLAY), player(nullptr), numHumansKilled(0), numZombiesKilled(0)
 {
     // Empty
 }
@@ -25,6 +25,14 @@ MainGame::~MainGame()
     for(int i=0;i<levels.size();i++)
 		delete levels[i];
 	levels.clear();
+
+	for(int i=0;i<humans.size();i++)
+		delete humans[i];
+	humans.clear();
+
+	for(int i=0;i<zombies.size();i++)
+		delete zombies[i];
+	zombies.clear();
 }
 
 void MainGame::Run() 
@@ -103,6 +111,8 @@ void MainGame::gameLoop()
 	while(gameState == PLAY)
 	{
 		fpsLimiter.Begin();
+
+		checkVictory();
 
 		processInput();
 
@@ -192,6 +202,7 @@ void MainGame::updateBullets()
 					delete zombies[j];
 					zombies[j] = zombies.back();
 					zombies.pop_back();
+					numZombiesKilled++;
 				}
 				else
 					j++;
@@ -218,6 +229,7 @@ void MainGame::updateBullets()
 						delete humans[j];
 						humans[j] = humans.back();
 						humans.pop_back();
+						numHumansKilled++;
 					}
 					else
 						j++;
@@ -233,6 +245,18 @@ void MainGame::updateBullets()
 		}
 	}
 }
+
+void MainGame::checkVictory()
+{
+	if (zombies.empty())
+	{
+		//TODO Support for multiple level. currentLevel++
+		printf("*** You win! ***\n You killed %d humans and %d zombies. There are %d/%d civilians remaining.",
+			numHumansKilled, numZombiesKilled, humans.size() -1, levels[currentLevel]->GetNumHumans());
+		Engine::fatalError("");
+	}
+}
+
 
 void MainGame::processInput() {
     SDL_Event evnt;

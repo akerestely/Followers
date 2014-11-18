@@ -41,6 +41,8 @@ private:
     /// Handles input processing
     void processInput();
 
+	void checkVictory();	
+
     /// Renders the game
     void drawGame();
 
@@ -66,6 +68,9 @@ private:
 	std::vector<Human*> humans;
 	std::vector<Zombie*> zombies;
 	std::vector<Bullet> bullets;
+
+	int numHumansKilled;
+	int numZombiesKilled;
 
 	GameState gameState;
 };
