@@ -33,7 +33,7 @@ protected:
 	void collideWithTile(glm::vec2 tilePos);
 
 	glm::vec2 position;
-	Engine::Color color;
+	Engine::ColorRGBA8 color;
 	float speed;
 	float health;
 };

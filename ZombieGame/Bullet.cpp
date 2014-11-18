@@ -25,7 +25,7 @@ void Bullet::Draw(Engine::SpriteBatch &spriteBatch)
 {
 	glm::vec4 destRect(position.x + BULLET_RADIUS, position.y +BULLET_RADIUS, BULLET_RADIUS*2, BULLET_RADIUS*2);
 	const glm::vec4 uvRect(0.0f, 0.0f, 1.0f, 1.0f);
-	spriteBatch.Draw(destRect, uvRect, Engine::ResourceMngr::GetTexture("Textures/circle.png").id, 0.0f, Engine::Color(75,75,75));
+	spriteBatch.Draw(destRect, uvRect, Engine::ResourceMngr::GetTexture("Textures/circle.png").id, 0.0f, Engine::ColorRGBA8(75,75,75));
 }
 
 bool Bullet::CollideWithAgent(Agent *agent)

@@ -37,16 +37,16 @@ Level::Level(const std::string &fileName)
 			switch (tile)
 			{
 			case 'R':
-				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/red_bricks.png").id,0.0f,Engine::Color(255,255,255,255));
+				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/red_bricks.png").id,0.0f,Engine::ColorRGBA8(255,255,255,255));
 				break;
 			case 'B':
-				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/red_bricks.png").id,0.0f,Engine::Color(255,255,255,255));
+				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/red_bricks.png").id,0.0f,Engine::ColorRGBA8(255,255,255,255));
 				break;
 			case 'G':
-				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/glass.png").id,0.0f,Engine::Color(255,255,255,255));
+				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/glass.png").id,0.0f,Engine::ColorRGBA8(255,255,255,255));
 				break;
 			case 'L':
-				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/light_bricks.png").id,0.0f,Engine::Color(255,255,255,255));
+				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/light_bricks.png").id,0.0f,Engine::ColorRGBA8(255,255,255,255));
 				break;
 			case '@':
 				levelData[i][j] = '.';

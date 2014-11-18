@@ -91,20 +91,20 @@ void MainGame::processInput()
 		}
 	}
 
-	if(inputManager.IsKeyPressed(SDLK_w))
+	if(inputManager.IsKeyDown(SDLK_w))
 		camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-	if(inputManager.IsKeyPressed(SDLK_s))
+	if(inputManager.IsKeyDown(SDLK_s))
 		camera.SetPosition(camera.GetPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-	if(inputManager.IsKeyPressed(SDLK_a))
+	if(inputManager.IsKeyDown(SDLK_a))
 		camera.SetPosition(camera.GetPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-	if(inputManager.IsKeyPressed(SDLK_d))
+	if(inputManager.IsKeyDown(SDLK_d))
 		camera.SetPosition(camera.GetPosition() + glm::vec2(CAMERA_SPEED, -0.0f));
-	if(inputManager.IsKeyPressed(SDLK_q))
+	if(inputManager.IsKeyDown(SDLK_q))
 		camera.SetScale(camera.GetScale() + SCALE_SPEED);
-	if(inputManager.IsKeyPressed(SDLK_e))
+	if(inputManager.IsKeyDown(SDLK_e))
 		camera.SetScale(camera.GetScale() - SCALE_SPEED);
 
-	if(inputManager.IsKeyPressed(SDL_BUTTON_LEFT))
+	if(inputManager.IsKeyDown(SDL_BUTTON_LEFT))
 	{
 		glm::vec2 mouseCoords = inputManager.GetMouseCoords();
 		mouseCoords = camera.ConvertScreenToWorld(mouseCoords);
@@ -133,11 +133,7 @@ void MainGame::renderScene()
 	glm::vec4 pos(0,0,50,50);
 	glm::vec4 uv(0,0,1,1);
 	static Engine::GLTexture texture = Engine::ResourceMngr::GetTexture("Textures/PNG/HearthEnemy1.png");
-	Engine::Color color;
-	color.r=255;
-	color.g=255;
-	color.b=255;
-	color.a=255;
+	Engine::ColorRGBA8 color;
 
 	for(int i=0; i<100; i++)
 	{

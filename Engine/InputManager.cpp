@@ -21,7 +21,7 @@ namespace Engine
 		keyMap[keyID] = false;
 	}
 
-	bool InputManager::IsKeyPressed(unsigned int keyID)
+	bool InputManager::IsKeyDown(unsigned int keyID)
 	{
 		auto it = keyMap.find(keyID);
 		if(it != keyMap.end())

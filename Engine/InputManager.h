@@ -12,7 +12,7 @@ namespace Engine
 		void PressKey(unsigned int keyID);
 		void ReleaseKey(unsigned int keyID);
 
-		bool IsKeyPressed(unsigned int keyID);
+		bool IsKeyDown(unsigned int keyID);
 
 		void SetMouseCoords(float x, float y);
 		glm::vec2 GetMouseCoords() const { return mouseCoords; }
