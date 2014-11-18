@@ -33,10 +33,10 @@ private:
     void gameLoop();
 
 	//Update all agents
-	void updateAgents();
+	void updateAgents(float deltaTime);
 
 	//Update all bullets
-	void updateBullets();
+	void updateBullets(float deltaTime);
 
     /// Handles input processing
     void processInput();

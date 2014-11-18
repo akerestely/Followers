@@ -33,7 +33,7 @@ void Human::Init(float speed, glm::vec2 position)
 	
 }
 
-void Human::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies)
+void Human::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies, float deltaTime)
 {
 	position += direction * speed;
 

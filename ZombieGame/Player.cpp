@@ -33,16 +33,16 @@ void Player::AddGun(Gun *gun)
 		currentGunIndex=0;
 }
 
-void Player::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies)
+void Player::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies, float deltaTime)
 {
 	if(inputManager->IsKeyDown(SDLK_w))
-		position.y += speed;
+		position.y += speed * deltaTime;
 	else if(inputManager->IsKeyDown(SDLK_s))
-		position.y -= speed;
+		position.y -= speed * deltaTime;
 	if(inputManager->IsKeyDown(SDLK_a))
-		position.x -= speed;
+		position.x -= speed * deltaTime;
 	else if(inputManager->IsKeyDown(SDLK_d))
-		position.x += speed;
+		position.x += speed * deltaTime;
 
 	if(inputManager->IsKeyDown(SDLK_1) && guns.size() >= 0)
 		currentGunIndex = 0;
@@ -56,7 +56,7 @@ void Player::Update(const std::vector<std::string> &levelData, std::vector<Human
 		glm::vec2 mouseCoords = camera->ConvertScreenToWorld(inputManager->GetMouseCoords());
 		glm::vec2 centerPosition = position + glm::vec2(AGENT_RADIUS);
 		glm::vec2 direction = glm::normalize(mouseCoords - centerPosition);
-		guns[currentGunIndex]->Update(inputManager->IsKeyDown(SDL_BUTTON_LEFT), centerPosition, direction, *bullets);
+		guns[currentGunIndex]->Update(inputManager->IsKeyDown(SDL_BUTTON_LEFT), centerPosition, direction, *bullets, deltaTime);
 	}
 
 	CollideWithLevel(levelData);

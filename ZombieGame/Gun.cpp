@@ -20,9 +20,9 @@ Gun::~Gun(void)
 {
 }
 
-void Gun::Update(bool isMouseDown,const glm::vec2& position, glm::vec2 direction, std::vector<Bullet> &bullets)
+void Gun::Update(bool isMouseDown,const glm::vec2& position, glm::vec2 direction, std::vector<Bullet> &bullets, float deltaTime)
 {
-	frameCounter++;
+	frameCounter += 1.0f * deltaTime;
 	if(frameCounter >= fireRate && isMouseDown)
 	{
 		fire(direction, position, bullets);

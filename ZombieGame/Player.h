@@ -15,7 +15,7 @@ public:
 
 	void AddGun(Gun *gun);
 
-	void Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies) override;
+	void Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies, float deltaTime) override;
 private:
 	Engine::InputManager *inputManager;
 	std::vector<Gun*> guns;

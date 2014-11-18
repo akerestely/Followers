@@ -105,22 +105,43 @@ void MainGame::initShaders()
 
 void MainGame::gameLoop() 
 {
+	const float DESIRED_FPS = 60;
+	const int MAX_PHYSICS_STEPS = 6;
+
 	Engine::FpsLimiter fpsLimiter;
 	fpsLimiter.SetMaxFps(60000);
 
 	const float CAMERA_SCALE = 1.0/4.0;
 	camera.SetScale(CAMERA_SCALE);
 
+	const float MS_PER_SECOND = 1000;
+	const float DESIRED_FRAMETIME = MS_PER_SECOND / DESIRED_FPS;
+	const float MAX_DELTA_TIME = 1.0;
+
+	float prevTicks = SDL_GetTicks();
+
 	while(gameState == PLAY)
 	{
 		fpsLimiter.Begin();
+
+		float newTicks = SDL_GetTicks();
+		float frameTime = newTicks - prevTicks;
+		prevTicks = newTicks;
+		float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
 
 		checkVictory();
 
 		processInput();
 
-		updateAgents();
-		updateBullets();
+		int i = 0;
+		while(totalDeltaTime > 0.0f && i < MAX_PHYSICS_STEPS)
+		{
+			float deltaTime = std::min(totalDeltaTime, MAX_DELTA_TIME);
+			updateAgents(deltaTime);
+			updateBullets(deltaTime);
+			totalDeltaTime -= deltaTime;
+			i++;
+		}
 
 		camera.SetPosition(player->GetPosition());
 		camera.Update();
@@ -133,15 +154,15 @@ void MainGame::gameLoop()
 	}
 }
 
-void MainGame::updateAgents()
+void MainGame::updateAgents(float deltaTime)
 {
 	//update all humans
 	for (int i=0; i<humans.size(); i++)
-		humans[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies);
+		humans[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies,deltaTime);
 
 	//update all zombies
 	for (int i=0; i<zombies.size(); i++)
-		zombies[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies);
+		zombies[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies,deltaTime);
 
 	//update zombies collisions
 	for (int i=0; i<zombies.size(); i++)
@@ -178,12 +199,12 @@ void MainGame::updateAgents()
 	}
 }
 
-void MainGame::updateBullets()
+void MainGame::updateBullets(float deltaTime)
 {
 	// update & collide with world
 	for (int i=0; i<bullets.size();)
 	{
-		if(bullets[i].Update(levels[currentLevel]->GetLevelData()))
+		if(bullets[i].Update(levels[currentLevel]->GetLevelData(),deltaTime))
 		{
 			bullets[i] = bullets.back();
 			bullets.pop_back();
