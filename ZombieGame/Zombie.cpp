@@ -15,6 +15,7 @@ void Zombie::Init(float speed, glm::vec2 position)
 {
 	this->speed = speed;
 	this->position = position;
+	health = 150;
 	color.r=0;
 	color.g=160;
 	color.b=0;

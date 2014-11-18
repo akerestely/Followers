@@ -24,6 +24,9 @@ public:
 
 	void Draw(Engine::SpriteBatch &spriteBatch);
 
+	//true if died
+	bool ApplyDamage(float damage);
+
 	glm::vec2 GetPosition() const { return position; }
 protected:
 	void checkTilePos(const std::vector<std::string> &levelData, std::vector<glm::vec2> &collideTilePos, float x, float y);
@@ -32,5 +35,6 @@ protected:
 	glm::vec2 position;
 	Engine::Color color;
 	float speed;
+	float health;
 };
 

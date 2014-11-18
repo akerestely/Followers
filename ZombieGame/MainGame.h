@@ -7,6 +7,7 @@
 
 #include "Level.h"
 #include "Player.h"
+#include "Bullet.h"
 
 enum GameState {PLAY,EXIT};
 
@@ -31,7 +32,11 @@ private:
     /// Main game loop for the program
     void gameLoop();
 
+	//Update all agents
 	void updateAgents();
+
+	//Update all bullets
+	void updateBullets();
 
     /// Handles input processing
     void processInput();
@@ -60,6 +65,7 @@ private:
 	Player *player;
 	std::vector<Human*> humans;
 	std::vector<Zombie*> zombies;
+	std::vector<Bullet> bullets;
 
 	GameState gameState;
 };

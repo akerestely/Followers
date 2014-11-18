@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-	InputManager::InputManager(void)
+	InputManager::InputManager(void) : mouseCoords(0.0f)
 	{
 	}
 

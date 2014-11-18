@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include "Zombie.h"
+#include "Gun.h"
 
 const float HUMAN_SPEED = 1.0f;
 const float ZOMBIE_SPEED = 1.3f;
@@ -53,7 +54,7 @@ void MainGame::initLevel()
 	currentLevel=0;
 
 	player = new Player();
-	player->Init(4.0f, levels[currentLevel]->GetPlayerStartPos(),&inputManager);
+	player->Init(4.0f, levels[currentLevel]->GetPlayerStartPos(), &inputManager, &camera, &bullets);
 	
 	humans.push_back(player);
 
@@ -77,6 +78,11 @@ void MainGame::initLevel()
 		zombies.push_back(new Zombie);
 		zombies.back()->Init(ZOMBIE_SPEED, zombiePositions[i]);
 	}
+
+	//set up the players guns
+	player->AddGun(new Gun("Magnum", 10, 1, 10.0f, 30, 20.0f));
+	player->AddGun(new Gun("Shotgun", 30, 12, 20.0f, 4, 20.0f));
+	player->AddGun(new Gun("MP5", 2, 1, 10.0f, 10, 20.0f));
 }
 
 void MainGame::initShaders() 
@@ -101,6 +107,7 @@ void MainGame::gameLoop()
 		processInput();
 
 		updateAgents();
+		updateBullets();
 
 		camera.SetPosition(player->GetPosition());
 		camera.Update();
@@ -152,6 +159,77 @@ void MainGame::updateAgents()
 		for (int j=i+1; j<humans.size(); j++)
 		{
 			humans[i]->CollideWithAgent(humans[j]);
+		}
+	}
+}
+
+void MainGame::updateBullets()
+{
+	// update & collide with world
+	for (int i=0; i<bullets.size();)
+	{
+		if(bullets[i].Update(levels[currentLevel]->GetLevelData()))
+		{
+			bullets[i] = bullets.back();
+			bullets.pop_back();
+		}
+		else
+			i++;
+	}
+
+	bool wasBulletRemoved;
+	// collide with agents
+	for (int i=0; i<bullets.size(); i++)
+	{
+		wasBulletRemoved = false;
+		// check for zombies collision
+		for(int j=0; j< zombies.size(); )
+			if(bullets[i].CollideWithAgent(zombies[j]))
+			{
+				//damage zombies
+				if(zombies[j]->ApplyDamage(bullets[i].GetDamage()))
+				{
+					delete zombies[j];
+					zombies[j] = zombies.back();
+					zombies.pop_back();
+				}
+				else
+					j++;
+
+				//remove the bullet
+				bullets[i] = bullets.back();
+				bullets.pop_back();
+				wasBulletRemoved = true;
+				i--;
+				break;
+			}
+			else
+				j++;
+
+		if(!wasBulletRemoved)
+		{
+			// check for humans collision
+			for(int j=1; j< humans.size(); )
+				if(bullets[i].CollideWithAgent(humans[j]))
+				{
+					//damage humans
+					if(humans[j]->ApplyDamage(bullets[i].GetDamage()))
+					{
+						delete humans[j];
+						humans[j] = humans.back();
+						humans.pop_back();
+					}
+					else
+						j++;
+
+					//remove the bullet
+					bullets[i] = bullets.back();
+					bullets.pop_back();
+					i--;
+					break;
+				}
+				else
+					j++;
 		}
 	}
 }
@@ -211,6 +289,10 @@ void MainGame::drawGame() {
 	//draw zombies
 	for (int i=0; i<zombies.size(); i++)
 		zombies[i]->Draw(agentSpriteBatch);
+
+	//draw bullets
+	for (int i=0; i<bullets.size(); i++)
+		bullets[i].Draw(agentSpriteBatch);
 
 	agentSpriteBatch.End();
 	agentSpriteBatch.RenderBatches();

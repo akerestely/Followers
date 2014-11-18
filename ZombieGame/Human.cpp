@@ -14,20 +14,23 @@ Human::~Human(void)
 
 void Human::Init(float speed, glm::vec2 position)
 {
+	this->speed = speed;
+	this->position = position;
+	color.r=200;
+	color.g=0;
+	color.b=200;
+	health = 20;
+
 	do
 	{
 		static std::mt19937 randomEngine(time(nullptr));
 		static std::uniform_real_distribution<float> randDir(-1.0f, 1.0f);
 
-		this->speed = speed;
-		this->position = position;
 		direction = glm::vec2(randDir(randomEngine), randDir(randomEngine));
 	}while(direction.length() == 0);
 
 	direction = glm::normalize(direction);
-	color.r=200;
-	color.g=0;
-	color.b=200;
+	
 }
 
 void Human::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies)

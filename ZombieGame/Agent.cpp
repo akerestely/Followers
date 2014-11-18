@@ -61,6 +61,13 @@ void Agent::Draw(Engine::SpriteBatch &spriteBatch)
 	spriteBatch.Draw(destRect, uvRect, texture, 0.0f, color);
 }
 
+bool Agent::ApplyDamage(float damage)
+{
+	health -= damage;
+	return (health <= 0);
+
+}
+
 void Agent::checkTilePos(const std::vector<std::string> &levelData, std::vector<glm::vec2> &collideTilePos, float x, float y)
 {
 	glm::vec2 cornerPos = glm::vec2(floor(x / TILE_WIDTH), floor(y / TILE_WIDTH) );
