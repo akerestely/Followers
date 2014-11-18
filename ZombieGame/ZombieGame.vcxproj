@@ -45,7 +45,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)deps\include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>..\deps\lib;..\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\deps\lib;..\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

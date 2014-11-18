@@ -106,7 +106,10 @@ void MainGame::initShaders()
 void MainGame::gameLoop() 
 {
 	Engine::FpsLimiter fpsLimiter;
-	fpsLimiter.SetMaxFps(60);
+	fpsLimiter.SetMaxFps(60000);
+
+	const float CAMERA_SCALE = 1.0/4.0;
+	camera.SetScale(CAMERA_SCALE);
 
 	while(gameState == PLAY)
 	{
@@ -125,6 +128,8 @@ void MainGame::gameLoop()
 		drawGame();
 
 		fps=fpsLimiter.End();
+
+		std::cout<<fps<<'\n';
 	}
 }
 
@@ -139,7 +144,7 @@ void MainGame::updateAgents()
 		zombies[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies);
 
 	//update zombies collisions
-	for (int i=0; i<zombies.size()-1; i++)
+	for (int i=0; i<zombies.size(); i++)
 	{
 		//collide with other zombies
 		for (int j=i+1; j<zombies.size(); j++)
