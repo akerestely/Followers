@@ -13,6 +13,7 @@ namespace Engine
 		void Init(int screenWidth, int screenHeight);
 		void Update();
 
+		glm::vec2 ConvertScreenToWorld(glm::vec2 screenCoords);
 
 		//setters
 		void SetPosition(const glm::vec2 &newPosition){ position = newPosition; needsUpdate=true; }

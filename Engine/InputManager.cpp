@@ -28,4 +28,11 @@ namespace Engine
 			return it->second;
 		return false;
 	}
+
+	void InputManager::SetMouseCoords(float x, float y)
+	{
+		mouseCoords.x=x;
+		mouseCoords.y=y;
+	}
+
 }

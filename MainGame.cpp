@@ -79,6 +79,15 @@ void MainGame::processInput()
 		case SDL_KEYUP:
 			inputManager.ReleaseKey(evnt.key.keysym.sym);
 			break;
+		case SDL_MOUSEBUTTONDOWN:
+			inputManager.PressKey(evnt.button.button);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			inputManager.ReleaseKey(evnt.button.button);
+			break;
+		case SDL_MOUSEMOTION:
+			inputManager.SetMouseCoords(evnt.motion.x, evnt.motion.y);
+			break;
 		}
 	}
 
@@ -94,6 +103,13 @@ void MainGame::processInput()
 		camera.SetScale(camera.GetScale() + SCALE_SPEED);
 	if(inputManager.IsKeyPressed(SDLK_e))
 		camera.SetScale(camera.GetScale() - SCALE_SPEED);
+
+	if(inputManager.IsKeyPressed(SDL_BUTTON_LEFT))
+	{
+		glm::vec2 mouseCoords = inputManager.GetMouseCoords();
+		mouseCoords = camera.ConvertScreenToWorld(mouseCoords);
+		std::cout<<mouseCoords.x<<" "<<mouseCoords.y<<"\n";
+	}
 }
 
 void MainGame::renderScene()

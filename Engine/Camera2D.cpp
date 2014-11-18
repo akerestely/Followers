@@ -36,4 +36,14 @@ namespace Engine
 			needsUpdate = false;
 		}
 	}
+
+	glm::vec2 Camera2D::ConvertScreenToWorld(glm::vec2 screenCoords)
+	{
+		screenCoords.y = screenHeight - screenCoords.y;
+		screenCoords -= glm::vec2(screenWidth/2, screenHeight/2);
+		screenCoords /= scale;
+		screenCoords += position;
+		return screenCoords;
+	}
+
 }
