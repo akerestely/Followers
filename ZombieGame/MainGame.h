@@ -4,7 +4,9 @@
 #include <Engine/GLSLProgram.h>
 #include <Engine/Camera2D.h>
 #include <Engine/InputManager.h>
+
 #include "Level.h"
+#include "Player.h"
 
 enum GameState {PLAY,EXIT};
 
@@ -29,6 +31,8 @@ private:
     /// Main game loop for the program
     void gameLoop();
 
+	void updateAgents();
+
     /// Handles input processing
     void processInput();
 
@@ -43,6 +47,7 @@ private:
     Engine::InputManager inputManager; ///< Handles input
 
     Engine::Camera2D camera; ///< Main Camera
+	Engine::SpriteBatch agentSpriteBatch;
 
 	std::vector<Level *> levels;
 
@@ -51,6 +56,10 @@ private:
 	float fps;
 
 	int currentLevel;
+
+	Player *player;
+	std::vector<Human*> humans;
+	std::vector<Zombie*> zombies;
 
 	GameState gameState;
 };

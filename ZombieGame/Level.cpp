@@ -15,6 +15,7 @@ Level::Level(const std::string &fileName)
 	
 	std::string tmp;
 	file>>tmp>>numHumans;
+	std::getline(file, tmp);
 
 	while(std::getline(file,tmp))
 	{
@@ -48,10 +49,12 @@ Level::Level(const std::string &fileName)
 				spriteBatch.Draw(destRect,uvRect,Engine::ResourceMngr::GetTexture("Textures/light_bricks.png").id,0.0f,Engine::Color(255,255,255,255));
 				break;
 			case '@':
+				levelData[i][j] = '.';
 				playerStartPos.x = j*TILE_WIDTH;
 				playerStartPos.y = i*TILE_WIDTH;
 				break;
 			case 'Z':
+				levelData[i][j] = '.';
 				zombieStartPositions.push_back(glm::ivec2(j*TILE_WIDTH,i*TILE_WIDTH));
 				break;
 			case '.':

@@ -2,11 +2,19 @@
 
 #include <Engine/Engine.h>
 #include <Engine/Timing.h>
+#include <Engine/Errors.h>
 
 #include <SDL/SDL.h>
 #include <iostream>
+#include <random>
+#include <ctime>
 
-MainGame::MainGame(): screenWidth(600), screenHeight(400), gameState(PLAY)
+#include "Zombie.h"
+
+const float HUMAN_SPEED = 1.0f;
+const float ZOMBIE_SPEED = 1.3f;
+
+MainGame::MainGame(): screenWidth(1000), screenHeight(800), gameState(PLAY), player(nullptr)
 {
     // Empty
 }
@@ -34,6 +42,8 @@ void MainGame::initSystems()
 
 	initShaders();
 
+	agentSpriteBatch.Init();
+
 	camera.Init(screenWidth, screenHeight);
 }
 
@@ -41,6 +51,32 @@ void MainGame::initLevel()
 {
 	levels.push_back(new Level("Levels/level1.txt"));
 	currentLevel=0;
+
+	player = new Player();
+	player->Init(4.0f, levels[currentLevel]->GetPlayerStartPos(),&inputManager);
+	
+	humans.push_back(player);
+
+	std::mt19937 randomEngine;
+	randomEngine.seed(time(0));
+	std::uniform_int_distribution<int> randX(2, levels[currentLevel]->GetWidth() - 2);
+	std::uniform_int_distribution<int> randY(2, levels[currentLevel]->GetHeight() - 2);
+
+	//Add all the random humans
+	for(int i=0; i<levels[currentLevel]->GetNumHumans();i++)
+	{
+		humans.push_back(new Human);
+		glm::vec2 pos(randX(randomEngine) * TILE_WIDTH, randY(randomEngine) * TILE_WIDTH);
+		humans.back()->Init(HUMAN_SPEED, pos);
+	}
+
+	//Add the starting zombies
+	const std::vector<glm::vec2> &zombiePositions = levels[currentLevel]->GetZombieStartPos();
+	for(int i=0; i<zombiePositions.size(); i++)
+	{
+		zombies.push_back(new Zombie);
+		zombies.back()->Init(ZOMBIE_SPEED, zombiePositions[i]);
+	}
 }
 
 void MainGame::initShaders() 
@@ -63,6 +99,10 @@ void MainGame::gameLoop()
 		fpsLimiter.Begin();
 
 		processInput();
+
+		updateAgents();
+
+		camera.SetPosition(player->GetPosition());
 		camera.Update();
 
 		drawGame();
@@ -71,14 +111,59 @@ void MainGame::gameLoop()
 	}
 }
 
+void MainGame::updateAgents()
+{
+	//update all humans
+	for (int i=0; i<humans.size(); i++)
+		humans[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies);
+
+	//update all zombies
+	for (int i=0; i<zombies.size(); i++)
+		zombies[i]->Update(levels[currentLevel]->GetLevelData(),humans,zombies);
+
+	//update zombies collisions
+	for (int i=0; i<zombies.size()-1; i++)
+	{
+		//collide with other zombies
+		for (int j=i+1; j<zombies.size(); j++)
+		{
+			zombies[i]->CollideWithAgent(zombies[j]);
+		}
+		//collide with humans
+		for (int j=1; j<humans.size(); j++)
+		{
+			if(zombies[i]->CollideWithAgent(humans[j]))
+			{
+				zombies.push_back(new Zombie);
+				zombies.back()->Init(ZOMBIE_SPEED,humans[j]->GetPosition());
+				//delete the human
+				delete humans[j];
+				humans[j] = humans.back();
+				humans.pop_back();
+			}
+		}
+		if(zombies[i]->CollideWithAgent(player))
+			Engine::fatalError("You lost!");
+	}
+
+	//update human collisions
+	for (int i=0; i<humans.size()-1; i++)
+	{
+		for (int j=i+1; j<humans.size(); j++)
+		{
+			humans[i]->CollideWithAgent(humans[j]);
+		}
+	}
+}
+
 void MainGame::processInput() {
     SDL_Event evnt;
     //Will keep looping until there are no more events to process
     while (SDL_PollEvent(&evnt)) {
         switch (evnt.type) {
-            case SDL_QUIT:
-                // Exit the game here!
-                break;
+			case SDL_QUIT:
+				gameState=EXIT;
+				break;
             case SDL_MOUSEMOTION:
                 inputManager.SetMouseCoords(evnt.motion.x, evnt.motion.y);
                 break;
@@ -116,6 +201,19 @@ void MainGame::drawGame() {
 	glUniformMatrix4fv(pUniform,1, GL_FALSE, &projectionMatrix[0][0]);
 
 	levels[currentLevel]->Draw();
+
+	agentSpriteBatch.Begin();
+
+	//draw the humans
+	for (int i=0; i<humans.size(); i++)
+		humans[i]->Draw(agentSpriteBatch);
+
+	//draw zombies
+	for (int i=0; i<zombies.size(); i++)
+		zombies[i]->Draw(agentSpriteBatch);
+
+	agentSpriteBatch.End();
+	agentSpriteBatch.RenderBatches();
 
 	textureProgram.UnUse();
    
