@@ -15,6 +15,8 @@ namespace Engine
 
 		glm::vec2 ConvertScreenToWorld(glm::vec2 screenCoords);
 
+		bool IsBoxInView(const glm::vec2 &position, const glm::vec2 &dimensions);
+
 		//setters
 		void SetPosition(const glm::vec2 &newPosition){ position = newPosition; needsUpdate=true; }
 		void SetScale(float newScale) { scale = newScale; needsUpdate=true; }
