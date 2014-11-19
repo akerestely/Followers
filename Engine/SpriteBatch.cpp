@@ -23,42 +23,24 @@ namespace Engine
 	{
 		this->sortType = sortType;
 		renderBatches.clear();
-		for (int i=0; i<glyphs.size();i++)
-		{
-			delete glyphs[i];
-		}
 		glyphs.clear();
 	}
 
 	void SpriteBatch::End()
 	{
+		glyphPointers.resize(glyphs.size());
+		for(int i=0; i<glyphs.size(); i++)
+			glyphPointers[i] = &glyphs[i];
+
 		sortGlyphs();
 		createRenderBatches();
 	}
 
 	void SpriteBatch::Draw(const glm::vec4 &destRect, const glm::vec4 &uvRect, GLuint texture, float depth, const ColorRGBA8 &color)
 	{
-		Glyph *newGlyph = new Glyph();
-		newGlyph->texture = texture;
-		newGlyph->depth = depth;
-				
-		newGlyph->topLeft.color = color;
-		newGlyph->topLeft.SetPosition(destRect.x, destRect.y + destRect.w);
-		newGlyph->topLeft.SetUV(uvRect.x, uvRect.y + uvRect.w);
-				
-		newGlyph->bottomLeft.color = color;
-		newGlyph->bottomLeft.SetPosition(destRect.x, destRect.y);
-		newGlyph->bottomLeft.SetUV(uvRect.x, uvRect.y);
-				
-		newGlyph->bottomRight.color = color;
-		newGlyph->bottomRight.SetPosition(destRect.x + destRect.z, destRect.y);
-		newGlyph->bottomRight.SetUV(uvRect.x + uvRect.z, uvRect.y);
-				
-		newGlyph->topRight.color = color;
-		newGlyph->topRight.SetPosition(destRect.x + destRect.z, destRect.y + destRect.w);
-		newGlyph->topRight.SetUV(uvRect.x + uvRect.z, uvRect.y + uvRect.w);
+		Glyph newGlyph(destRect, uvRect, texture, depth, color);
 
-		glyphs.push_back(newGlyph);
+		glyphs.emplace_back(newGlyph);
 	}
 
 	void SpriteBatch::RenderBatches()
@@ -77,41 +59,41 @@ namespace Engine
 	void SpriteBatch::createRenderBatches()
 	{
 		std::vector<Vertex> vertices;
-		vertices.resize(glyphs.size() * 6);
+		vertices.resize(glyphPointers.size() * 6);
 
-		if(glyphs.empty())
+		if(glyphPointers.empty())
 			return;
 		
 		int offset = 0;
 		int cv = 0;
 
-		RenderBatch rb(offset, 6, glyphs[0]->texture);
+		RenderBatch rb(offset, 6, glyphPointers[0]->texture);
 		renderBatches.emplace_back(rb);
-		vertices[cv++] = glyphs[0]->topLeft;
-		vertices[cv++] = glyphs[0]->bottomLeft;
-		vertices[cv++] = glyphs[0]->bottomRight;
-		vertices[cv++] = glyphs[0]->bottomRight;
-		vertices[cv++] = glyphs[0]->topRight;
-		vertices[cv++] = glyphs[0]->topLeft;
+		vertices[cv++] = glyphPointers[0]->topLeft;
+		vertices[cv++] = glyphPointers[0]->bottomLeft;
+		vertices[cv++] = glyphPointers[0]->bottomRight;
+		vertices[cv++] = glyphPointers[0]->bottomRight;
+		vertices[cv++] = glyphPointers[0]->topRight;
+		vertices[cv++] = glyphPointers[0]->topLeft;
 		offset += 6;
 
-		for(int cg=1; cg<glyphs.size(); cg++)
+		for(int cg=1; cg<glyphPointers.size(); cg++)
 		{
-			if(glyphs[cg]->texture != glyphs[cg-1]->texture)
+			if(glyphPointers[cg]->texture != glyphPointers[cg-1]->texture)
 			{
-				RenderBatch rb(offset, 6, glyphs[cg]->texture);
+				RenderBatch rb(offset, 6, glyphPointers[cg]->texture);
 				renderBatches.emplace_back(rb);
 			}
 			else
 			{
 				renderBatches.back().numVertices += 6;
 			}
-			vertices[cv++] = glyphs[cg]->topLeft;
-			vertices[cv++] = glyphs[cg]->bottomLeft;
-			vertices[cv++] = glyphs[cg]->bottomRight;
-			vertices[cv++] = glyphs[cg]->bottomRight;
-			vertices[cv++] = glyphs[cg]->topRight;
-			vertices[cv++] = glyphs[cg]->topLeft;
+			vertices[cv++] = glyphPointers[cg]->topLeft;
+			vertices[cv++] = glyphPointers[cg]->bottomLeft;
+			vertices[cv++] = glyphPointers[cg]->bottomRight;
+			vertices[cv++] = glyphPointers[cg]->bottomRight;
+			vertices[cv++] = glyphPointers[cg]->topRight;
+			vertices[cv++] = glyphPointers[cg]->topLeft;
 			offset += 6;
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -161,13 +143,13 @@ void SpriteBatch::unbindBufferAndAttribs()
 		switch(sortType)
 		{
 		case BACK_TO_FRONT:
-			std::stable_sort(glyphs.begin(), glyphs.end(),compareBackToFront);
+			std::stable_sort(glyphPointers.begin(), glyphPointers.end(),compareBackToFront);
 			break;
 		case FRONT_TO_BACK:
-			std::stable_sort(glyphs.begin(), glyphs.end(),compareFrontToBack);
+			std::stable_sort(glyphPointers.begin(), glyphPointers.end(),compareFrontToBack);
 			break;
 		case TEXTURE:
-			std::stable_sort(glyphs.begin(), glyphs.end(),compareTexture);
+			std::stable_sort(glyphPointers.begin(), glyphPointers.end(),compareTexture);
 			break;
 		}
 	}
