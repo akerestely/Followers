@@ -35,7 +35,7 @@ void Human::Init(float speed, glm::vec2 position)
 
 void Human::Update(const std::vector<std::string> &levelData, std::vector<Human*> &humans, std::vector<Zombie*> &zombies, float deltaTime)
 {
-	position += direction * speed;
+	position += direction * speed * deltaTime;
 
 	static std::mt19937 randomEngine(time(nullptr));
 	static std::uniform_real_distribution<float> randRot(-40.0f, 40.0f);

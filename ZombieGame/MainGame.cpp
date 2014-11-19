@@ -109,9 +109,9 @@ void MainGame::gameLoop()
 	const int MAX_PHYSICS_STEPS = 6;
 
 	Engine::FpsLimiter fpsLimiter;
-	fpsLimiter.SetMaxFps(60000);
+	fpsLimiter.SetMaxFps(DESIRED_FPS * MAX_PHYSICS_STEPS);
 
-	const float CAMERA_SCALE = 1.0/4.0;
+	const float CAMERA_SCALE = 1.0/3.0;
 	camera.SetScale(CAMERA_SCALE);
 
 	const float MS_PER_SECOND = 1000;
@@ -133,14 +133,13 @@ void MainGame::gameLoop()
 
 		processInput();
 
-		int i = 0;
-		while(totalDeltaTime > 0.0f && i < MAX_PHYSICS_STEPS)
+		
+		for(int i = 0; totalDeltaTime > 0.0f && i < MAX_PHYSICS_STEPS; i++)
 		{
 			float deltaTime = std::min(totalDeltaTime, MAX_DELTA_TIME);
 			updateAgents(deltaTime);
 			updateBullets(deltaTime);
 			totalDeltaTime -= deltaTime;
-			i++;
 		}
 
 		camera.SetPosition(player->GetPosition());
