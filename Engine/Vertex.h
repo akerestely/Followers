@@ -8,12 +8,15 @@ namespace Engine
 		float y;
 	};
 
-	struct Color
+	struct ColorRGBA8
 	{
-		char r;
-		char g;
-		char b;
-		char a;
+		GLubyte r;
+		GLubyte g;
+		GLubyte b;
+		GLubyte a;
+		ColorRGBA8(GLubyte r=255, GLubyte b=255, GLubyte g=255, GLubyte a=255) :r(r), g(g), b(b), a(a)
+		{
+		}
 	};
 
 	struct UV
@@ -25,7 +28,7 @@ namespace Engine
 	struct Vertex
 	{
 		Position position;
-		Color color;
+		ColorRGBA8 color;
 		UV uv;
 
 		void SetPosition(float x, float y)
