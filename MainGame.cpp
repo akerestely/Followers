@@ -10,7 +10,6 @@ MainGame::MainGame(void) :
 	screenWidth(800),
 	screenHeight(600),
 	gameState(PLAY),
-	time(0),
 	maxFps(60)
 {
 	camera.Init(screenWidth,screenHeight);
@@ -31,7 +30,6 @@ void MainGame::initSystems()
 
 	initShaders();
 
-	spriteBatch.Init();
 	fpsLimiter.Init(maxFps);
 }
 
@@ -51,13 +49,11 @@ void MainGame::gameLoop()
 		fpsLimiter.Begin();
 
 		processInput();
-		time += 0.01f;
 
 		camera.Update();
 		renderScene();
 
 		fps = fpsLimiter.End();
-		std::cout<<fps<<"\n";
 	}
 }
 
@@ -108,7 +104,6 @@ void MainGame::processInput()
 	{
 		glm::vec2 mouseCoords = inputManager.GetMouseCoords();
 		mouseCoords = camera.ConvertScreenToWorld(mouseCoords);
-		std::cout<<mouseCoords.x<<" "<<mouseCoords.y<<"\n";
 	}
 }
 
@@ -128,21 +123,7 @@ void MainGame::renderScene()
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 
-	spriteBatch.Begin();
-
-	glm::vec4 pos(0,0,50,50);
-	glm::vec4 uv(0,0,1,1);
-	static Engine::GLTexture texture = Engine::ResourceMngr::GetTexture("Textures/PNG/HearthEnemy1.png");
-	Engine::ColorRGBA8 color;
-
-	for(int i=0; i<100; i++)
-	{
-		spriteBatch.Draw(pos,uv,texture.id,0,color);
-		spriteBatch.Draw(pos + glm::vec4(50,0,0,0),uv,texture.id,0,color);
-	}
-
-	spriteBatch.End();
-	spriteBatch.RenderBatches();
+	//actual drawing here
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);

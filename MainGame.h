@@ -33,13 +33,10 @@ private:
 	Engine::GLSLProgram colorProgram;
 	Engine::Camera2D camera;
 
-	Engine::SpriteBatch spriteBatch;
-
 	Engine::InputManager inputManager;
 	Engine::FpsLimiter fpsLimiter;
 
 	float maxFps;
 	float fps;
-	float time;
 };
 
