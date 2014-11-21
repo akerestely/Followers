@@ -1,6 +1,6 @@
 #version 120
 
-varying vec2 fragmentPosition;
+varying vec3 fragmentPosition;
 varying vec4 fragmentColor;
 varying vec2 fragmentUV;
 
@@ -8,7 +8,7 @@ uniform sampler2D mySampler;
 
 void main()
 {							
-	vec4 textureColor = texture2D(mySampler, fragmentUV);
+	//vec4 textureColor = texture2D(mySampler, fragmentUV);
 	//gl_FragColor = textureColor;
 	
 	//frag shader 1
@@ -26,5 +26,5 @@ void main()
 										// 1.0 * (sin(time + 1.0) +1.0) * 0.5, 0.0);
 	
 	//frag shader 3
-	gl_FragColor = fragmentColor * textureColor;
+	gl_FragColor = fragmentColor;// * textureColor;
 }

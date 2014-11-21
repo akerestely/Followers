@@ -1,4 +1,5 @@
 #pragma once
+#include <gl/glew.h>
 
 namespace Engine
 {
@@ -6,6 +7,10 @@ namespace Engine
 	{
 		float x;
 		float y;
+		float z;
+		Position(float x = 0.0f, float y = 0.0f, float z = 0.0f) :x(x), y(y), z(z)
+		{
+		}
 	};
 
 	struct ColorRGBA8
@@ -14,7 +19,7 @@ namespace Engine
 		GLubyte g;
 		GLubyte b;
 		GLubyte a;
-		ColorRGBA8(GLubyte r=255, GLubyte b=255, GLubyte g=255, GLubyte a=255) :r(r), g(g), b(b), a(a)
+		ColorRGBA8(GLubyte r=0, GLubyte b=0, GLubyte g=0, GLubyte a=255) :r(r), g(g), b(b), a(a)
 		{
 		}
 	};
@@ -23,6 +28,9 @@ namespace Engine
 	{
 		float u;
 		float v;
+		UV(float u = 0.0f, float v = 0.0f) :u(u), v(v)
+		{
+		}
 	};
 
 	struct Vertex
@@ -31,10 +39,11 @@ namespace Engine
 		ColorRGBA8 color;
 		UV uv;
 
-		void SetPosition(float x, float y)
+		void SetPosition(float x, float y, float z)
 		{
 			position.x=x;
 			position.y=y;
+			position.z=z;
 		}
 
 		void SetColor(GLubyte r, GLubyte g, GLubyte b, GLubyte a)

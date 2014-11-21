@@ -96,14 +96,12 @@
     <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="ResourceMngr.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="Timing.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera3D.h" />
+    <ClInclude Include="CameraSpectator.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Errors.h" />
     <ClInclude Include="GLSLProgram.h" />
@@ -113,8 +111,6 @@
     <ClInclude Include="IOManager.h" />
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="ResourceMngr.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="Timing.h" />
     <ClInclude Include="Vertex.h" />

@@ -36,9 +36,6 @@
     <ClCompile Include="ResourceMngr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextureCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,9 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteBatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputManager.cpp">
@@ -83,9 +77,6 @@
     <ClInclude Include="ResourceMngr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextureCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,16 +89,13 @@
     <ClInclude Include="Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteBatch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera3D.h">
+    <ClInclude Include="CameraSpectator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
