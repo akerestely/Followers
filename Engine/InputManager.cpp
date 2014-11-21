@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-	InputManager::InputManager(void) : mouseCoords(0.0f)
+	InputManager::InputManager(void) : mouseCoords(0), mouseCoordsRel(0)
 	{
 	}
 
@@ -10,6 +10,13 @@ namespace Engine
 	InputManager::~InputManager(void)
 	{
 	}
+
+	void InputManager::Update()
+	{
+		mouseCoordsRel.x=0;
+		mouseCoordsRel.y=0;
+	}
+
 
 	void InputManager::PressKey(unsigned int keyID)
 	{
@@ -29,10 +36,16 @@ namespace Engine
 		return false;
 	}
 
-	void InputManager::SetMouseCoords(float x, float y)
+	void InputManager::SetMouseCoords(int x, int y)
 	{
 		mouseCoords.x=x;
 		mouseCoords.y=y;
+	}
+
+	void InputManager::SetMouseCoordsRel(int x, int y)
+	{
+		mouseCoordsRel.x=x;
+		mouseCoordsRel.y=y;
 	}
 
 }
