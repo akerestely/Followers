@@ -17,9 +17,11 @@ namespace Engine
 
 		void SwappBuffer();
 
-		int GetScreenWidth();
-		int GetScreenHeight();
+		int GetScreenWidth() { return screenWidth; }
+		int GetScreenHeight() { return screenHeight; }
 
+		bool IsFullscreen();
+		void Fullscreen(bool visibility);
 	private:
 		SDL_Window *sdlWindow;
 		int screenWidth, screenHeight;

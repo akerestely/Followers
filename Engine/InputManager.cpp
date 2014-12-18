@@ -20,19 +20,33 @@ namespace Engine
 
 	void InputManager::PressKey(unsigned int keyID)
 	{
-		keyMap[keyID] = true;
+		keyMap[keyID].pressed = true;
 	}
 
 	void InputManager::ReleaseKey(unsigned int keyID)
 	{
-		keyMap[keyID] = false;
+		keyMap[keyID].pressed = false;
+		keyMap[keyID].usedOnce = false;
 	}
 
 	bool InputManager::IsKeyDown(unsigned int keyID)
 	{
 		auto it = keyMap.find(keyID);
 		if(it != keyMap.end())
-			return it->second;
+			return it->second.pressed;
+		return false;
+	}
+
+
+	bool InputManager::IsKeyDownOnce(unsigned int keyID)
+	{
+		auto it = keyMap.find(keyID);
+		if(it != keyMap.end())
+			if(it->second.pressed && !it->second.usedOnce)
+			{
+				it->second.usedOnce = true;
+				return true;
+			}
 		return false;
 	}
 

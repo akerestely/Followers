@@ -20,7 +20,7 @@ namespace Engine
 		if (currentFlags & INVISIBLE)
 			flags |= SDL_WINDOW_HIDDEN;
 		if (currentFlags & FULLSCREEN)
-			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			flags |= SDL_WINDOW_FULLSCREEN;
 		if (currentFlags & BORDERLESS)
 			flags |= SDL_WINDOW_BORDERLESS;
 
@@ -52,4 +52,18 @@ namespace Engine
 	{
 		SDL_GL_SwapWindow(sdlWindow);
 	}
+
+	bool Window::IsFullscreen()
+	{
+		return SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_FULLSCREEN;
+	}
+
+	void Window::Fullscreen(bool visibility)
+	{
+		if(visibility)
+			SDL_SetWindowFullscreen(sdlWindow,SDL_WINDOW_FULLSCREEN);
+		else
+			SDL_SetWindowFullscreen(sdlWindow,0);
+	}
+
 }

@@ -19,7 +19,7 @@ namespace Engine
 		GLubyte g;
 		GLubyte b;
 		GLubyte a;
-		ColorRGBA8(GLubyte r=0, GLubyte b=0, GLubyte g=0, GLubyte a=255) :r(r), g(g), b(b), a(a)
+		ColorRGBA8(GLubyte r=0, GLubyte g=0, GLubyte b=0, GLubyte a=255) :r(r), g(g), b(b), a(a)
 		{
 		}
 	};
