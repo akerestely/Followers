@@ -3,13 +3,11 @@
 #include <Engine/Engine.h>
 #include <Engine/Window.h>
 #include <Engine/GLSLProgram.h>
-#include <Engine/GLTexture.h>
-#include <Engine/Camera2D.h>
-
-#include <Engine/Sprite.h>
-#include "Engine/SpriteBatch.h"
+#include <Engine/CameraSpectator.h>
 #include "Engine/InputManager.h"
 #include "Engine/Timing.h"
+
+#include "Level.h"
 
 enum GameState {PLAY,EXIT}; 
 
@@ -31,12 +29,14 @@ private:
 	GameState gameState;
 
 	Engine::GLSLProgram colorProgram;
-	Engine::Camera2D camera;
+	Engine::CameraSpectator camera;
 
 	Engine::InputManager inputManager;
 	Engine::FpsLimiter fpsLimiter;
 
 	float maxFps;
 	float fps;
+
+	Level *l;
 };
 
