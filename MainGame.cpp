@@ -5,6 +5,9 @@
 #include <Engine/ImageLoader.h>
 //remove
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+//
 
 MainGame::MainGame(void) :
 	screenWidth(800),
@@ -32,10 +35,14 @@ void MainGame::initSystems()
 	initShaders();
 
 	camera.Init(screenWidth,screenHeight);
+	camera.Rotate(glm::vec3(0.0f, 180.0f, 0.0f));
 
 	fpsLimiter.Init(maxFps);
 
 	l=new Level("Resources/Map/imgn45w114_1");
+	//remove
+	m = new Model();
+	//
 	glClearColor(0.5,0.5,0.5,0.5);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -63,7 +70,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		std::cout<<fps<<'\n';
+		//std::cout<<fps<<'\n';
 	}
 }
 
@@ -104,10 +111,6 @@ void MainGame::processInput()
 
 	if(inputManager.IsKeyDown(SDLK_ESCAPE))
 		gameState = EXIT;
-// 		if(SDL_GetRelativeMouseMode() == SDL_TRUE)
-// 			SDL_SetRelativeMouseMode(SDL_FALSE);
-// 		else
-// 			SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	if(inputManager.IsKeyDown(SDLK_LSHIFT))
 		CAMERA_SPEED=10;
@@ -118,6 +121,9 @@ void MainGame::processInput()
 		l->SwitchWireframeVisibility();
 	if(inputManager.IsKeyDownOnce(SDLK_F4))
 		window.Fullscreen(!window.IsFullscreen());
+
+	if(inputManager.IsKeyDownOnce(SDLK_v))
+		SDL_SetRelativeMouseMode(SDL_GetRelativeMouseMode()==SDL_TRUE ? SDL_FALSE:SDL_TRUE);
 
 	if(inputManager.IsKeyDown(SDLK_w))
 		camera.Move(glm::vec3(0.0f, 0.0f, -CAMERA_SPEED));
@@ -139,6 +145,31 @@ void MainGame::processInput()
 		glm::vec2 mouseCoords = inputManager.GetMouseCoordsRel();
 		camera.Rotate(glm::vec3(mouseCoords.y*MOUSE_SENSITIVITY, mouseCoords.x*MOUSE_SENSITIVITY,0.0f));
 	}
+	if(inputManager.IsKeyDown(SDL_BUTTON_LEFT))
+	{
+		int x = inputManager.GetMouseCoords().x;
+		int y = inputManager.GetMouseCoords().y;
+
+		GLbyte color[4];
+		GLfloat depth;
+		GLuint index;
+
+		glReadPixels(x, screenHeight - y - 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+		glReadPixels(x, screenHeight - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		glReadPixels(x, screenHeight - y - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+		printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index %u\n",
+			x, y, color[0], color[1], color[2], color[3], depth, index);
+
+		glm::vec4 viewport = glm::vec4(0, 0, screenWidth, screenHeight);
+		glm::vec3 wincoord = glm::vec3(x, screenHeight - y - 1, depth);
+		glm::vec3 objcoord = glm::unProject(wincoord, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport);
+
+		printf("Coordinates in object space: %f, %f, %f\n",
+			objcoord.x, objcoord.y, objcoord.z);
+
+		movement = objcoord;
+	}
 }
 
 void MainGame::renderScene()
@@ -159,6 +190,13 @@ void MainGame::renderScene()
 
 	//actual drawing here
 	l->Render();
+
+	movement.x+=0.1;
+	movement.z+=0.1;
+	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z))/10 - 230;
+	cameraMatrix = glm::translate(cameraMatrix, movement);
+	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+	m->Render();
 
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();

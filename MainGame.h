@@ -9,6 +9,10 @@
 
 #include "Level.h"
 
+//remove
+#include "Engine\Model.h"
+//
+
 enum GameState {PLAY,EXIT}; 
 
 class MainGame
@@ -38,5 +42,10 @@ private:
 	float fps;
 
 	Level *l;
+	Model *m;
+
+	//remove
+	glm::vec3 movement;
+	//
 };
 
