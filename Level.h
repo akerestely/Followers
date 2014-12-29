@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include <glm/glm.hpp>
 
 #include "Engine/Vertex.h"
 
@@ -12,6 +13,9 @@ public:
 	void SwitchWireframeVisibility();
 
 	void Render();
+
+	double GetHeight(glm::vec2 point2d);
+
 	~Level(void);
 private:
 	void readBinaryData(const std::string &fileName);

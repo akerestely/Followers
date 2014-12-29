@@ -7,6 +7,7 @@
 
 const int ROW = 200;
 const int COL = 200;
+const double CELL_SIZE = 1;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
 {
@@ -34,7 +35,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 		for (int x=0; x<COL; x++)
 		{
 			float y = levelData[z*nRows + x];
-			vertexData[z*ROW + x].SetPosition((x-COL/2)*2, y/10 - 230, (z - ROW/2)*2);
+			vertexData[z*ROW + x].SetPosition((x)*CELL_SIZE, y/10 - 230, (z)*CELL_SIZE);
 			vertexData[z*ROW + x].color = getColorByHeight(y);
 		}
 	glGenBuffers(1, &vboId);
@@ -47,7 +48,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{
-			vertexData[z*ROW + x].position.y += 0.01;
+			//vertexData[z*ROW + x].position.y += 0.01;
 			vertexData[z*ROW + x].color = wireframeColor;
 		}
 	glGenBuffers(1, &vboIdWireframe);
@@ -133,6 +134,9 @@ void Level::Render()
 
 	if(showWireframe)
 	{
+		glPolygonOffset(1, 1);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
@@ -152,6 +156,27 @@ void Level::Render()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+double Level::GetHeight(glm::vec2 point2d)
+{
+	int posx1 = (int)(point2d.x / CELL_SIZE);
+	int posx2 = posx1 + 1;
+	int posy1 = (int)(point2d.y / CELL_SIZE);
+	int posy2 = posy1 + 1;
+
+	double f00 = levelData[posy1*nRows + posx1];
+	double f10 = levelData[posy1*nRows + posx2];
+	double f11 = levelData[posy2*nRows + posx2];
+	double f01 = levelData[posy2*nRows + posx1];
+
+	double px = point2d.x / CELL_SIZE - posx1;
+	double py = point2d.y / CELL_SIZE - posy2;
+
+	double fFinal = f00 * (1.0 - px) * (1.0 - py) +
+		f10 * px * (1.0 - py) + f01 * (1.0 - px) * py + f11 * px * py;
+
+	return fFinal;
 }
 
 void Level::readAscFile(const std::string &fileName)
