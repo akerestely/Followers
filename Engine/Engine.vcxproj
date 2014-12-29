@@ -94,6 +94,7 @@
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="IOManager.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="ResourceMngr.cpp" />
     <ClCompile Include="TextureCache.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IOManager.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="ResourceMngr.h" />
     <ClInclude Include="TextureCache.h" />
