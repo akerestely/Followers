@@ -13,7 +13,8 @@ namespace Engine
 	:	screenWidth(500), 
 		screeHeight(500), 
 		position(0.0f), 
-		rotation(0.0f), 
+		rotation(0.0f),
+		viewMatrix(1.0f),
 		projectionMatrix(1.0f), 
 		cameraMatrix(1.0f),
 		needsUpdate(true)
@@ -31,17 +32,18 @@ namespace Engine
 	{
 		this->screenWidth = screenWidth;
 		this->screeHeight = screeHeight;
-		projectionMatrix = glm::perspective(45.0f, (float)screenWidth/screeHeight, 0.1f, 1000.0f);
+		projectionMatrix = glm::perspective(45.0f, (float)screenWidth/screeHeight, 0.5f, 1000.0f);
 	}
 
 	void CameraSpectator::Update()
 	{
 		if(needsUpdate)
 		{
-			cameraMatrix = glm::translate(projectionMatrix, glm::vec3(0.0f, 0.0f, 0.0f));//dist from player
-			cameraMatrix = glm::rotate(cameraMatrix, rotation.x, OX);
-			cameraMatrix = glm::rotate(cameraMatrix, rotation.y, OY);
-			cameraMatrix = glm::translate(cameraMatrix, position);
+			viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));//dist from player
+			viewMatrix = glm::rotate(viewMatrix, rotation.x, OX);
+			viewMatrix = glm::rotate(viewMatrix, rotation.y, OY);
+			viewMatrix = glm::translate(viewMatrix, position);
+			cameraMatrix = projectionMatrix * viewMatrix;
 			needsUpdate = false;
 		}
 	}
