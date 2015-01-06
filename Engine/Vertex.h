@@ -12,6 +12,35 @@ namespace Engine
 		Position(float x = 0.0f, float y = 0.0f, float z = 0.0f) :x(x), y(y), z(z)
 		{
 		}
+		Position operator + (Position p)
+		{
+			p.x+=x;
+			p.y+=y;
+			p.z+=z;
+			return p;
+		}
+		Position operator - (Position p)
+		{
+			p.x-=x;
+			p.y-=y;
+			p.z-=z;
+			return p;
+		}
+		Position operator / (const float d)
+		{
+			Position p = *this;
+			p.x/=d;
+			p.y/=d;
+			p.z/=d;
+			return p;
+		}
+		Position& operator /= (const float d)
+		{
+			this->x/=d;
+			this->y/=d;
+			this->z/=d;
+			return *this;
+		}
 		void Normalize()
 		{
 			// calculate the length of the vector 
@@ -19,9 +48,7 @@ namespace Engine
 			// avoid division by 0 
 			if (len == 0.0f) len = 1.0f; 
 			// reduce to unit size 
-			x /= len; 
-			y /= len; 
-			z /= len;
+			*this /= len;
 		}
 	};
 

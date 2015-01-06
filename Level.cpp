@@ -38,6 +38,22 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 			vertexData[z*ROW + x].SetPosition((x)*CELL_SIZE, y/10 - 230, (z)*CELL_SIZE);
 			vertexData[z*ROW + x].color = getColorByHeight(y);
 		}
+
+	//calculate vertex normals based on triangles formed with adjacent vertexes
+	//interior
+	for(int z=1; z<ROW-1; z++)
+		for (int x=1; x<COL-1; x++)
+		{
+			Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z-1)*ROW + x].position);
+			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x-1].position);
+			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x+1].position);
+			Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z+1)*ROW + x].position);
+			vertexData[z*ROW + x].normal = (leftUpper + leftLower + rightUpper + rightLower)/4;
+		}
+	//TODO corners
+	//first and last row
+	//first and last column
+	//upload to GPU
 	glGenBuffers(1, &vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL, vertexData,GL_STATIC_DRAW);
@@ -241,19 +257,13 @@ Engine::ColorRGBA8 Level::getColorByHeight(float height)
 	return cRes;
 }
 
-Engine::Position Level::normal(Engine::Position p[3])
+Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine::Position p3)
 {
 	Engine::Position a, b;
 	// calculate the vectors A and B
 	// note that p[3] is defined with counterclockwise winding in mind
-	// a 
-	a.x = p[0].x - p[1].x; 
-	a.y = p[0].y - p[1].y; 
-	a.z = p[0].z - p[1].z; 
-	// b 
-	b.x = p[1].x - p[2].x; 
-	b.y = p[1].y - p[2].y; 
-	b.z = p[1].z - p[2].z; 
+	a = p1 - p2; 
+	b = p2 - p3; 
 
 	// calculate the cross product
 	Engine::Position normal;
@@ -263,6 +273,7 @@ Engine::Position Level::normal(Engine::Position p[3])
 
 	// normalize 
 	normal.Normalize();
+	return normal;
 }
 
 void Level::readBinaryData(const std::string &fileName)
