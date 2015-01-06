@@ -1,6 +1,7 @@
 #version 120
 
 attribute vec3 vertexPosition;
+attribute vec3 vertexNormal;
 attribute vec4 vertexColor;
 attribute vec2 vertexUV;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <gl/glew.h>
+#include <math.h>
 
 namespace Engine
 {
@@ -10,6 +11,17 @@ namespace Engine
 		float z;
 		Position(float x = 0.0f, float y = 0.0f, float z = 0.0f) :x(x), y(y), z(z)
 		{
+		}
+		void Normalize()
+		{
+			// calculate the length of the vector 
+			float len = (float)(sqrt((x * x) + (y * y) + (z * z))); 
+			// avoid division by 0 
+			if (len == 0.0f) len = 1.0f; 
+			// reduce to unit size 
+			x /= len; 
+			y /= len; 
+			z /= len;
 		}
 	};
 
@@ -36,6 +48,7 @@ namespace Engine
 	struct Vertex
 	{
 		Position position;
+		Position normal;
 		ColorRGBA8 color;
 		UV uv;
 

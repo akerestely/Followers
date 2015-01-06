@@ -23,7 +23,7 @@ Model::Model(void)
     0, 255, 0,
     0, 0, 255,
     255, 255, 255,
-    // back colsors
+    // back colors
     255, 0, 0,
     0, 255, 0,
     0, 0, 255,
@@ -79,9 +79,11 @@ void Model::Render()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
-	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
+	glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
+	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
 	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -90,5 +92,6 @@ void Model::Render()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

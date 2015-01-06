@@ -51,8 +51,10 @@ void MainGame::initSystems()
 
 void MainGame::initShaders()
 {
+	//warning!!! order matters!!!
 	colorProgram.CompileShaders("shaders/colorShading.vert","shaders/colorShading.frag");
 	colorProgram.AddAttribute("vertexPosition");
+	colorProgram.AddAttribute("vertexNormal");
 	colorProgram.AddAttribute("vertexColor");
 	//colorProgram.AddAttribute("vertexUV");
 	colorProgram.LinkShader();
@@ -70,7 +72,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		//std::cout<<fps<<'\n';
+		std::cout<<fps<<'\n';
 	}
 }
 

@@ -47,10 +47,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	Engine::ColorRGBA8 wireframeColor(0,0,0,255);
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
-		{
-			//vertexData[z*ROW + x].position.y += 0.01;
 			vertexData[z*ROW + x].color = wireframeColor;
-		}
 	glGenBuffers(1, &vboIdWireframe);
 	glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL,vertexData, GL_STATIC_DRAW);
@@ -90,6 +87,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 			wireframeElements[k++] = (i+1)*COL + j;
 			wireframeElements[k++] = i*COL + j;
 
+			//rem
 			wireframeElements[k++] = i*COL + j+1;
 			wireframeElements[k++] = (i+1)*COL + j;
 
@@ -116,6 +114,7 @@ Level::~Level(void)
 void Level::SwitchWireframeVisibility()
 {
 	showWireframe = !showWireframe;
+	glPolygonOffset(1, 1);
 }
 
 void Level::Render()
@@ -124,9 +123,11 @@ void Level::Render()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
-	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
+	glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
+	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
 	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -134,16 +135,16 @@ void Level::Render()
 
 	if(showWireframe)
 	{
-		glPolygonOffset(1, 1);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
-		glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
+		glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
+		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboIdWireframe);
 		int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -155,6 +156,7 @@ void Level::Render()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -235,6 +237,30 @@ Engine::ColorRGBA8 Level::getColorByHeight(float height)
 	cRes.b = (c2.b - c1.b) * t + c1.b;
 	cRes.a = (c2.a - c1.a) * t + c1.a;
 	return cRes;
+}
+
+Engine::Position Level::normal(Engine::Position p[3])
+{
+	Engine::Position a, b;
+	// calculate the vectors A and B
+	// note that p[3] is defined with counterclockwise winding in mind
+	// a 
+	a.x = p[0].x - p[1].x; 
+	a.y = p[0].y - p[1].y; 
+	a.z = p[0].z - p[1].z; 
+	// b 
+	b.x = p[1].x - p[2].x; 
+	b.y = p[1].y - p[2].y; 
+	b.z = p[1].z - p[2].z; 
+
+	// calculate the cross product
+	Engine::Position normal;
+	normal.x = (a.y * b.z) - (a.z * b.y); 
+	normal.y = (a.z * b.x) - (a.x * b.z); 
+	normal.z = (a.x * b.y) - (a.y * b.x); 
+
+	// normalize 
+	normal.Normalize();
 }
 
 void Level::readBinaryData(const std::string &fileName)

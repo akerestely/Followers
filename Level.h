@@ -23,6 +23,7 @@ private:
 	void writeToBinary(const std::string &fileName,unsigned int nCols=0U, unsigned int nRows=0U);
 
 	Engine::ColorRGBA8 getColorByHeight(float height);
+	Engine::Position normal(Engine::Position p[3]);
 
 	unsigned int nCols, nRows;
 	float *levelData;
