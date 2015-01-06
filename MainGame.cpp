@@ -7,6 +7,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 //
 
 MainGame::MainGame(void) :
@@ -72,7 +73,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		std::cout<<fps<<'\n';
+		//std::cout<<fps<<'\n';
 	}
 }
 
@@ -141,6 +142,23 @@ void MainGame::processInput()
 		else
 			camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
+	//light movement
+	static const float LIGHT_SPEED = 5.0f;
+	if(inputManager.IsKeyDown(SDLK_UP))
+		lightPos.z-=LIGHT_SPEED;
+	if(inputManager.IsKeyDown(SDLK_DOWN))
+		lightPos.z+=LIGHT_SPEED;
+	if(inputManager.IsKeyDown(SDLK_LEFT))
+		lightPos.x-=LIGHT_SPEED;
+	if(inputManager.IsKeyDown(SDLK_RIGHT))
+		lightPos.x+=LIGHT_SPEED;
+	if(inputManager.IsKeyDown(SDLK_PAGEUP))
+		lightPos.y+=LIGHT_SPEED;
+	if(inputManager.IsKeyDown(SDLK_PAGEDOWN))
+		lightPos.y-=LIGHT_SPEED;
+
+	std::cout<<lightPos.x<<" "<<lightPos.y<<" "<<lightPos.z<<"\n";
+
 	if(SDL_GetRelativeMouseMode() == SDL_TRUE)
 	{
 		static const float MOUSE_SENSITIVITY = 0.2f;
@@ -185,6 +203,14 @@ void MainGame::renderScene()
 	//GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
 	//glUniform1i(textureLocation, 0);
 
+	//move light
+	GLint lightPosLocation = colorProgram.GetUniformLocation("lightPos");
+	glUniform3fv(lightPosLocation, 1, &lightPos[0]);
+	//set the inverse matrix
+// 	GLint inverseMatrixLocation = colorProgram.GetUniformLocation("inverseMatrix");
+// 	glm::mat3 inverseMatrix = glm::mat3(glm::inverseTranspose(camera.GetViewMatrix()));
+// 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
+
 	//set the camera matrix
 	GLint pLocation = colorProgram.GetUniformLocation("P");
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
@@ -193,10 +219,11 @@ void MainGame::renderScene()
 	//actual drawing here
 	l->Render();
 
+	//move cube
 	movement.x+=0.1;
 	movement.z+=0.1;
 	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z))/10 - 230;
-	cameraMatrix = glm::translate(cameraMatrix, movement);
+	cameraMatrix = glm::translate(cameraMatrix, lightPos);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 	m->Render();
 

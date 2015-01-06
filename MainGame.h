@@ -46,6 +46,7 @@ private:
 
 	//remove
 	glm::vec3 movement;
+	glm::vec3 lightPos;
 	//
 };
 
