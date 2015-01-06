@@ -73,27 +73,28 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	delete[] mapElements;
 
-	//assign horizontal line indices.
+	//assign line indices.
 	unsigned int *wireframeElements = new unsigned int[(COL-1)*(ROW-1)*2*3*2];
 	for(int i=0,k=0; i<ROW-1; i++)
 		for(int j=0; j<COL-1; j++)
 		{
+			//horizontal top
 			wireframeElements[k++] = i*COL + j;
 			wireframeElements[k++] = i*COL + j+1;
 
+			//diagonal
 			wireframeElements[k++] = i*COL + j+1;
 			wireframeElements[k++] = (i+1)*COL + j;
 
+			//vertical left
 			wireframeElements[k++] = (i+1)*COL + j;
 			wireframeElements[k++] = i*COL + j;
 
-			//rem
-			wireframeElements[k++] = i*COL + j+1;
-			wireframeElements[k++] = (i+1)*COL + j;
-
+			//horizontal bottom
 			wireframeElements[k++] = (i+1)*COL + j;
 			wireframeElements[k++] = (i+1)*COL + j+1;
 
+			//vertical right
 			wireframeElements[k++] = (i+1)*COL + j+1;
 			wireframeElements[k++] = i*COL + j+1;
 		}
@@ -137,6 +138,7 @@ void Level::Render()
 	{
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
+		glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
