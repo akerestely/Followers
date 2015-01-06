@@ -36,6 +36,7 @@ Model::Model(void)
 	{
 		vertexData[i].SetPosition(cube_vertices[i*3], cube_vertices[i*3+1], cube_vertices[i*3+2]);
 		vertexData[i].SetColor(cube_colors[i*3], cube_colors[i*3+1], cube_colors[i*3+2], 255);
+		vertexData[i].normal = Engine::Position(1,1,1);
 	}
 	glGenBuffers(1, &vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
