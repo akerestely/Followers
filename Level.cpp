@@ -90,33 +90,32 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	delete[] mapElements;
 
 	//assign line indices.
-	unsigned int *wireframeElements = new unsigned int[(COL-1)*(ROW-1)*2*3*2];
-	for(int i=0,k=0; i<ROW-1; i++)
+	unsigned int *wireframeElements = new unsigned int[(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2];
+	int k=0;
+	//horizontal
+	for(int i=0; i<ROW; i++)
 		for(int j=0; j<COL-1; j++)
 		{
-			//horizontal top
 			wireframeElements[k++] = i*COL + j;
 			wireframeElements[k++] = i*COL + j+1;
-
-			//diagonal
-			wireframeElements[k++] = i*COL + j+1;
-			wireframeElements[k++] = (i+1)*COL + j;
-
-			//vertical left
-			wireframeElements[k++] = (i+1)*COL + j;
+		}
+	//vertical
+	for(int j=0; j<COL; j++)
+		for(int i=0; i<ROW-1; i++)
+		{
 			wireframeElements[k++] = i*COL + j;
-
-			//horizontal bottom
 			wireframeElements[k++] = (i+1)*COL + j;
-			wireframeElements[k++] = (i+1)*COL + j+1;
-
-			//vertical right
-			wireframeElements[k++] = (i+1)*COL + j+1;
+		}
+	//diagonal
+	for(int i=0; i<ROW-1; i++)
+		for(int j=0; j<COL-1; j++)
+		{
 			wireframeElements[k++] = i*COL + j+1;
+			wireframeElements[k++] = (i+1)*COL + j;
 		}
 	glGenBuffers(1, &iboIdWireframe);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboIdWireframe);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(COL-1)*(ROW-1)*2*3*2, wireframeElements, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2, wireframeElements, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	delete[] wireframeElements;
 
@@ -131,7 +130,6 @@ Level::~Level(void)
 void Level::SwitchWireframeVisibility()
 {
 	showWireframe = !showWireframe;
-	glPolygonOffset(1, 1);
 }
 
 void Level::Render()
@@ -152,6 +150,7 @@ void Level::Render()
 
 	if(showWireframe)
 	{
+		glPolygonOffset(1, 1);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
