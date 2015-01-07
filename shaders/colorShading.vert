@@ -53,6 +53,6 @@ void main()
 	gl_Position = P * vec4(vertexPosition, 1.0);
 	
 	fragmentPosition = vertexPosition;
-	fragmentColor = vec4(diffuseReflection, 1.0);
+	fragmentColor = vertexColor * vec4(diffuseReflection, 1.0);
 	fragmentUV = vec2(vertexUV.x, 1.0 - vertexUV.y);
 }
