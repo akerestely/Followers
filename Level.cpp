@@ -5,9 +5,14 @@
 #include "Engine/Errors.h"
 #include <stddef.h>
 
+#define kMERIDIAN_LENGTH_METERS   20003930.0
+#define kMERIDIAN_LENGTH_WGS_UNITS   ( 180.0 * 100000 )
+#define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
+#define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
+
 const int ROW = 200;
 const int COL = 200;
-const double CELL_SIZE = 1;
+const double CELL_SIZE = 10;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
 {
@@ -31,11 +36,12 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 
 	//construct vertex data based on level data
 	Engine::Vertex *vertexData = new Engine::Vertex[ ROW * COL ];
-	for(int z=0; z<ROW; z++)
+	double cosMeridian = cos(yllcorner*3.14/180);
+                                                                                                                                                                                                                                                        	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{
 			float y = levelData[z*nRows + x];
-			vertexData[z*ROW + x].SetPosition((x)*CELL_SIZE, y/10 - 230, (z)*CELL_SIZE);
+			vertexData[z*ROW + x].SetPosition(x*CELL_SIZE*cosMeridian, y*kMETER_TO_WGS_UNIT, z*CELL_SIZE);
 			vertexData[z*ROW + x].color = getColorByHeight(y);
 		}
 
@@ -198,47 +204,6 @@ double Level::GetHeight(glm::vec2 point2d)
 	return fFinal;
 }
 
-void Level::readAscFile(const std::string &fileName)
-{
-	std::ifstream file(fileName);
-	if(file.fail())
-		Engine::fatalError("File could not be opened!");
-
-	std::string temp; ///temporary string
-
-	file>>temp>>nCols; ///ignore word and read nCols
-
-	file>>temp>>nRows; ///ignore word and read nRows
-
-	for (int i=0; i < 5; i++)
-		std::getline(file,temp); ///ignore next 4 rows
-
-	//allocate memory
-	levelData = new float[nRows*nCols];
-	//read actual matrix data
-	for (int y=0; y<nRows; ++y)
-	{
-		const int FINISHED_ELEMENTS = y*nCols;
-		for (int x=0; x<nCols; ++x)
-			file>>levelData[FINISHED_ELEMENTS + x];
-	}
-}
-
-void Level::writeToBinary(const std::string &fileName, unsigned int nCols, unsigned int nRows)
-{
-	std::ofstream file(fileName,std::ios::binary);
-	if(file.fail())
-		Engine::fatalError("File could not be opened!");
-	if(!nCols) nCols = this->nCols;
-	if(!nRows) nRows = this->nRows;
-
-	file.write((char*)&nCols,sizeof(nCols));
-	file.write((char*)&nRows,sizeof(nRows));
-
-	for(int i=0; i<nRows; i++)
-		file.write((char*)&levelData[i*this->nCols],sizeof(float)*nCols);
-}
-
 Engine::ColorRGBA8 Level::getColorByHeight(float height)
 {
 	//Get the first element that is greater than or equal with height. This will be the upper bound. Seriously.
@@ -275,6 +240,49 @@ Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine:
 	return normal;
 }
 
+void Level::readAscFile(const std::string &fileName)
+{
+	std::ifstream file(fileName);
+	if(file.fail())
+		Engine::fatalError("File could not be opened!");
+
+	std::string temp; ///temporary string
+
+	file>>temp>>nCols; ///ignore word and read nCols
+	file>>temp>>nRows; ///ignore word and read nRows
+	file>>temp>>xllcorner; ///ignore word and read xllcorner
+	file>>temp>>yllcorner; ///ignore word and read yllcorner
+	file>>temp>>cellsize; ///ignore word and read cellsize
+	file>>temp>>noData_value; ///ignore word and read NODATA_value
+
+	//allocate memory
+	levelData = new float[nRows*nCols];
+	//read actual matrix data
+	for (int y=0; y<nRows; ++y)
+	{
+		const int FINISHED_ELEMENTS = y*nCols;
+		for (int x=0; x<nCols; ++x)
+			file>>levelData[FINISHED_ELEMENTS + x];
+	}
+}
+void Level::writeToBinary(const std::string &fileName, unsigned int nCols, unsigned int nRows)
+{
+	std::ofstream file(fileName,std::ios::binary);
+	if(file.fail())
+		Engine::fatalError("File could not be opened!");
+	if(!nCols) nCols = this->nCols;
+	if(!nRows) nRows = this->nRows;
+
+	file.write((char*)&nCols,sizeof(nCols));
+	file.write((char*)&nRows,sizeof(nRows));
+	file.write((char*)&xllcorner,sizeof(xllcorner));
+	file.write((char*)&yllcorner,sizeof(yllcorner));
+	file.write((char*)&cellsize,sizeof(cellsize));
+	file.write((char*)&noData_value,sizeof(noData_value));
+
+	for(int i=0; i<nRows; i++)
+		file.write((char*)&levelData[i*this->nCols],sizeof(float)*nCols);
+}
 void Level::readBinaryData(const std::string &fileName)
 {
 	//data from file
@@ -283,6 +291,10 @@ void Level::readBinaryData(const std::string &fileName)
 		Engine::fatalError("File could not be opened!");
 	file.read((char*)&nCols,sizeof(nCols));
 	file.read((char*)&nRows,sizeof(nRows));
+	file.read((char*)&xllcorner,sizeof(xllcorner));
+	file.read((char*)&yllcorner,sizeof(yllcorner));
+	file.read((char*)&cellsize,sizeof(cellsize));
+	file.read((char*)&noData_value,sizeof(noData_value));
 
 	levelData = new float[nRows*nCols];
 	file.read((char*)levelData,sizeof(float)*nRows*nCols);

@@ -37,6 +37,7 @@ void MainGame::initSystems()
 
 	camera.Init(screenWidth,screenHeight);
 	camera.Rotate(glm::vec3(0.0f, 180.0f, 0.0f));
+	camera.Move(glm::vec3(0.0f, 2300.f, 0.0f));
 
 	fpsLimiter.Init(maxFps);
 
@@ -222,8 +223,8 @@ void MainGame::renderScene()
 	//move cube
 	movement.x+=0.1;
 	movement.z+=0.1;
-	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z))/10 - 230;
-	cameraMatrix = glm::translate(cameraMatrix, lightPos);
+	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z));
+	cameraMatrix = glm::translate(cameraMatrix, movement);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 	m->Render();
 

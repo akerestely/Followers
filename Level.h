@@ -26,6 +26,7 @@ private:
 	Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine::Position p3);
 
 	unsigned int nCols, nRows;
+	float xllcorner, yllcorner, cellsize, noData_value;
 	float *levelData;
 
 	unsigned int vboId,iboId;
