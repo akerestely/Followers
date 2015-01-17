@@ -204,7 +204,7 @@ void Level::Render()
 		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
 
-		glDrawArrays(GL_LINES, 0, ROW * COL);
+		glDrawArrays(GL_LINES, 0, ROW * COL * 2);
 	}
 
 	//glDrawArrays(GL_TRIANGLES, 0, /*(ROW-1) **/ (COL-2));
