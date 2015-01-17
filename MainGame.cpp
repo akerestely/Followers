@@ -44,6 +44,7 @@ void MainGame::initSystems()
 	l=new Level("Resources/Map/imgn45w114_1");
 	//remove
 	m = new Model();
+	lightPos = glm::vec3(0,2000,0);
 	//
 	glClearColor(0.5,0.5,0.5,0.5);
 	glEnable(GL_DEPTH_TEST);
@@ -142,7 +143,7 @@ void MainGame::processInput()
 		camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
 	//light movement
-	static const float LIGHT_SPEED = 50.0f;
+	static const float LIGHT_SPEED = 5.0f;
 	if(inputManager.IsKeyDown(SDLK_UP))
 		lightPos.z-=LIGHT_SPEED;
 	if(inputManager.IsKeyDown(SDLK_DOWN))
@@ -211,18 +212,18 @@ void MainGame::renderScene()
 // 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
 
 	//set the camera matrix
-	GLint pLocation = colorProgram.GetUniformLocation("P");
+	GLint mvpLocation = colorProgram.GetUniformLocation("MVP");
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 
 	//actual drawing here
 	l->Render();
 
 	//move cube
-	movement.x+=0.1;
-	movement.z+=0.1;
-	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z));
-	cameraMatrix = glm::translate(cameraMatrix, movement);
+	//movement.x+=0.1;
+	//movement.z+=0.1;
+	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
+	cameraMatrix = glm::translate(cameraMatrix, lightPos);
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 	m->Render();
 

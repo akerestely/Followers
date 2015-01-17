@@ -31,6 +31,7 @@ private:
 
 	unsigned int vboId,iboId;
 	unsigned int vboIdWireframe,iboIdWireframe;
+	unsigned int vboNormals, iboNormals;
 	bool showWireframe;
 
 	std::map<float,Engine::ColorRGBA8> heightColorMap;

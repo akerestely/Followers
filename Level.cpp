@@ -55,10 +55,10 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	for(int z=1; z<ROW-1; z++)
 		for (int x=1; x<COL-1; x++)
 		{
-			Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z-1)*ROW + x].position);
-			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x-1].position);
-			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x+1].position);
-			Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z+1)*ROW + x].position);
+			Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x-1].position);
+			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
+			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+			Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x+1].position);
 			vertexData[z*ROW + x].normal = (leftUpper + leftLower + rightUpper + rightLower)/4;
 		}
 	//TODO corners
@@ -79,6 +79,20 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL,vertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//upload data for normals
+	Engine::Vertex *normalsData = new Engine::Vertex[ROW * COL *2];
+	for(int z=0,i=0; z<ROW; z++)
+		for (int x=0; x<COL; x++)
+		{
+			normalsData[i++].position = vertexData[z*COL +x].position;
+			normalsData[i++].position = vertexData[z*COL +x].position + vertexData[z*COL +x].normal*5;
+		}
+	glGenBuffers(1, &vboNormals);
+	glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL*2,normalsData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	delete[] normalsData;
 	delete[] vertexData;
 
 	//assign triangle indices. Two triangles at once, that form a rectangle.
@@ -161,6 +175,7 @@ void Level::Render()
 
 	if(showWireframe)
 	{
+		//draw wireframe
 		glPolygonOffset(1, 1);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
@@ -177,6 +192,19 @@ void Level::Render()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboIdWireframe);
 		int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		glDrawElements(GL_LINES, size/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+
+		//draw normals
+		glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
+		glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
+		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,color));
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
+
+		glDrawArrays(GL_LINES, 0, ROW * COL);
 	}
 
 	//glDrawArrays(GL_TRIANGLES, 0, /*(ROW-1) **/ (COL-2));

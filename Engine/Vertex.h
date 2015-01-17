@@ -26,6 +26,14 @@ namespace Engine
 			p.z-=z;
 			return p;
 		}
+		Position operator * (const float d)
+		{
+			Position p = *this;
+			p.x*=d;
+			p.y*=d;
+			p.z*=d;
+			return p;
+		}
 		Position operator / (const float d)
 		{
 			Position p = *this;
