@@ -74,7 +74,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		std::cout<<fps<<'\n';
+		//std::cout<<fps<<'\n';
 	}
 }
 
@@ -137,10 +137,9 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_d))
 		camera.Move(glm::vec3(CAMERA_SPEED, 0.0f, 0.0f));
 	if(inputManager.IsKeyDown(SDLK_SPACE))
-		if(!inputManager.IsKeyDown(SDLK_LCTRL))
-			camera.Move(glm::vec3(0.0f, CAMERA_SPEED, 0.0f));
-		else
-			camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
+		camera.Move(glm::vec3(0.0f, CAMERA_SPEED, 0.0f));
+	if(inputManager.IsKeyDown(SDLK_c))
+		camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
 	//light movement
 	static const float LIGHT_SPEED = 50.0f;
@@ -220,11 +219,11 @@ void MainGame::renderScene()
 	l->Render();
 
 	//move cube
-	//movement.x+=0.1;
-	//movement.z+=0.1;
+	movement.x+=0.1;
+	movement.z+=0.1;
 	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z));
 	cameraMatrix = glm::translate(cameraMatrix, movement);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 	m->Render();
 
 	//glBindTexture(GL_TEXTURE_2D, 0);

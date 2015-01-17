@@ -10,8 +10,8 @@
 #define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
 #define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
 
-const int ROW = 3611;
-const int COL = 3611;
+const int ROW = 211;
+const int COL = 211;
 const double CELL_SIZE = 10;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
@@ -22,6 +22,11 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 
 	//read binary data from file
 	readBinaryData(fileName);
+
+	//convert meters to WGS units
+	for(int z=0; z<nRows; z++)
+		for (int x=0; x<nCols; x++)
+			levelData[z*nCols + x]*=kMETER_TO_WGS_UNIT;
 
 	//build color height
 	heightColorMap.insert(std::make_pair(0.0f, Engine::ColorRGBA8()));
@@ -37,12 +42,12 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	//construct vertex data based on level data
 	Engine::Vertex *vertexData = new Engine::Vertex[ ROW * COL ];
 	double cosMeridian = cos(yllcorner*3.14/180);
-                                                                                                                                                                                                                                                        	for(int z=0; z<ROW; z++)
+	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{
-			float y = levelData[z*nRows + x];
-			vertexData[z*ROW + x].SetPosition(x*CELL_SIZE*cosMeridian, y*kMETER_TO_WGS_UNIT, z*CELL_SIZE);
-			vertexData[z*ROW + x].color = getColorByHeight(y);
+			float y = levelData[z*nCols + x];
+			vertexData[z*COL + x].SetPosition(x*CELL_SIZE*cosMeridian, y, z*CELL_SIZE);
+			vertexData[z*COL + x].color = getColorByHeight(y);
 		}
 
 	//calculate vertex normals based on triangles formed with adjacent vertexes
@@ -69,7 +74,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	Engine::ColorRGBA8 wireframeColor(0,0,0,255);
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
-			vertexData[z*ROW + x].color = wireframeColor;
+			vertexData[z*COL + x].color = wireframeColor;
 	glGenBuffers(1, &vboIdWireframe);
 	glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL,vertexData, GL_STATIC_DRAW);
@@ -185,18 +190,20 @@ void Level::Render()
 
 double Level::GetHeight(glm::vec2 point2d)
 {
-	int posx1 = (int)(point2d.x / CELL_SIZE);
+	double cosMeridian = cos(yllcorner*3.14/180);
+
+	int posx1 = (int)(point2d.x / CELL_SIZE / cosMeridian);
 	int posx2 = posx1 + 1;
 	int posy1 = (int)(point2d.y / CELL_SIZE);
 	int posy2 = posy1 + 1;
 
-	double f00 = levelData[posy1*nRows + posx1];
-	double f10 = levelData[posy1*nRows + posx2];
-	double f11 = levelData[posy2*nRows + posx2];
-	double f01 = levelData[posy2*nRows + posx1];
+	double f00 = levelData[posy1*nCols + posx1];
+	double f10 = levelData[posy1*nCols + posx2];
+	double f11 = levelData[posy2*nCols + posx2];
+	double f01 = levelData[posy2*nCols + posx1];
 
-	double px = point2d.x / CELL_SIZE - posx1;
-	double py = point2d.y / CELL_SIZE - posy2;
+	double px = point2d.x / CELL_SIZE /cosMeridian - posx1;
+	double py = point2d.y / CELL_SIZE - posy1;
 
 	double fFinal = f00 * (1.0 - px) * (1.0 - py) +
 		f10 * px * (1.0 - py) + f01 * (1.0 - px) * py + f11 * px * py;
