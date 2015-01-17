@@ -10,8 +10,8 @@
 #define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
 #define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
 
-const int ROW = 200;
-const int COL = 200;
+const int ROW = 3611;
+const int COL = 3611;
 const double CELL_SIZE = 10;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
@@ -32,7 +32,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	heightColorMap.insert(std::make_pair(2100.0f, Engine::ColorRGBA8(180,31,21)));
 	heightColorMap.insert(std::make_pair(2300.0f, Engine::ColorRGBA8(128,60,60)));
 	heightColorMap.insert(std::make_pair(2600.0f, Engine::ColorRGBA8(255,255,255)));
-	heightColorMap.insert(std::make_pair(3500.0f, Engine::ColorRGBA8(255,255,255,100)));
+	heightColorMap.insert(std::make_pair(4000.0f, Engine::ColorRGBA8(255,255,255,100)));
 
 	//construct vertex data based on level data
 	Engine::Vertex *vertexData = new Engine::Vertex[ ROW * COL ];
@@ -96,7 +96,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	delete[] mapElements;
 
 	//assign line indices.
-	unsigned int *wireframeElements = new unsigned int[(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2];
+	unsigned int *wireframeElements =new unsigned int[(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2];
 	int k=0;
 	//horizontal
 	for(int i=0; i<ROW; i++)

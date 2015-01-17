@@ -40,7 +40,7 @@ void main()
 	}
 	else // point or spot light
 	{ 
-		vec3 vertexToLightSource = vec3(light0.position - /*m * */ vertexPosition);
+		vec3 vertexToLightSource = vec3(vec3(light0.position) - /*m * */ vertexPosition);
 		float distance = length(vertexToLightSource);
 		attenuation = 1.0 / (light0.constantAttenuation 
 						   + light0.linearAttenuation * distance

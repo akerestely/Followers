@@ -74,7 +74,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		//std::cout<<fps<<'\n';
+		std::cout<<fps<<'\n';
 	}
 }
 
@@ -83,8 +83,7 @@ void MainGame::processInput()
 	inputManager.Update();
 
 	SDL_Event evnt;
-	float CAMERA_SPEED = 1.1f;
-	const float SCALE_SPEED = 0.1f;
+	float CAMERA_SPEED = 10.0f;
 	while(SDL_PollEvent(&evnt))
 	{
 		switch(evnt.type)
@@ -117,9 +116,9 @@ void MainGame::processInput()
 		gameState = EXIT;
 
 	if(inputManager.IsKeyDown(SDLK_LSHIFT))
-		CAMERA_SPEED=10;
+		CAMERA_SPEED=100.0f;
 	else
-		CAMERA_SPEED=1.1;
+		CAMERA_SPEED=10.1f;
 
 	if(inputManager.IsKeyDownOnce(SDLK_F1))
 		l->SwitchWireframeVisibility();
@@ -144,7 +143,7 @@ void MainGame::processInput()
 			camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
 	//light movement
-	static const float LIGHT_SPEED = 5.0f;
+	static const float LIGHT_SPEED = 50.0f;
 	if(inputManager.IsKeyDown(SDLK_UP))
 		lightPos.z-=LIGHT_SPEED;
 	if(inputManager.IsKeyDown(SDLK_DOWN))
@@ -158,7 +157,7 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_PAGEDOWN))
 		lightPos.y-=LIGHT_SPEED;
 
-	std::cout<<lightPos.x<<" "<<lightPos.y<<" "<<lightPos.z<<"\n";
+	//std::cout<<lightPos.x<<" "<<lightPos.y<<" "<<lightPos.z<<"\n";
 
 	if(SDL_GetRelativeMouseMode() == SDL_TRUE)
 	{
@@ -221,8 +220,8 @@ void MainGame::renderScene()
 	l->Render();
 
 	//move cube
-	movement.x+=0.1;
-	movement.z+=0.1;
+	//movement.x+=0.1;
+	//movement.z+=0.1;
 	movement.y=l->GetHeight(glm::vec2(movement.x,movement.z));
 	cameraMatrix = glm::translate(cameraMatrix, movement);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
