@@ -10,8 +10,8 @@
 #define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
 #define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
 
-const int ROW = 211;
-const int COL = 211;
+const int ROW = 1212;
+const int COL = 1212;
 const double CELL_SIZE = 10;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
@@ -45,7 +45,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{
-			float y = levelData[z*nCols + x];
+			float y = levelData[(z)*nCols + x];
 			vertexData[z*COL + x].SetPosition(x*CELL_SIZE*cosMeridian, y, z*CELL_SIZE);
 			vertexData[z*COL + x].color = getColorByHeight(y);
 		}
@@ -56,10 +56,15 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 		for (int x=1; x<COL-1; x++)
 		{
 			Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x-1].position);
-			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
-			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+			Engine::Position centerUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x+1].position);
 			Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x+1].position);
-			vertexData[z*ROW + x].normal = (leftUpper + leftLower + rightUpper + rightLower)/4;
+			Engine::Position centerLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
+			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x-1].position);
+			//Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
+			//Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+			vertexData[z*ROW + x].normal = (leftUpper + centerUpper + rightUpper + rightLower + centerLower + leftLower);
+			vertexData[z*ROW + x].normal.Normalize();
 		}
 	//TODO corners
 	//first and last row
@@ -101,8 +106,8 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 		for(int j=0; j<COL-1; j++)
 		{
 			mapElements[k++] = i*COL + j;
-			mapElements[k++] = i*COL + j+1;
 			mapElements[k++] = (i+1)*COL + j;
+			mapElements[k++] = i*COL + j+1;
 
  			mapElements[k++] = i*COL + j+1;
  			mapElements[k++] = (i+1)*COL + j;
@@ -270,8 +275,6 @@ Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine:
 	normal.y = (a.z * b.x) - (a.x * b.z); 
 	normal.z = (a.x * b.y) - (a.y * b.x); 
 
-	// normalize 
-	normal.Normalize();
 	return normal;
 }
 

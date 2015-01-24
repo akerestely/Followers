@@ -33,9 +33,9 @@ void main()
 	
 	//frag shader 4
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
-	float dist = length(lightPos - fragmentPosition);
+	//float dist = length(lightPos - fragmentPosition);
 	vec3 lightVector = normalize(lightPos - fragmentPosition);
-	float diffuse = max(0.1, dot(lightVector, fragmentNormal));
+	float diffuse = max(0.1, dot(fragmentNormal, lightVector));
 	//atenuate light
 	//diffuse = diffuse * (1.0 / (1.0 + 0.00001*dist*dist));
 	gl_FragColor = fragmentColor * vec4(lightColor*diffuse, 1.0);
