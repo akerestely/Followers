@@ -11,8 +11,8 @@
 //
 
 MainGame::MainGame(void) :
-	screenWidth(800),
-	screenHeight(600),
+	screenWidth(1024),
+	screenHeight(768),
 	gameState(PLAY),
 	maxFps(60)
 {
@@ -84,7 +84,7 @@ void MainGame::processInput()
 	inputManager.Update();
 
 	SDL_Event evnt;
-	float CAMERA_SPEED = 10.0f;
+	float CAMERA_SPEED = 1.0f;
 	while(SDL_PollEvent(&evnt))
 	{
 		switch(evnt.type)
@@ -119,7 +119,7 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_LSHIFT))
 		CAMERA_SPEED=100.0f;
 	else
-		CAMERA_SPEED=10.1f;
+		CAMERA_SPEED=1.1f;
 
 	if(inputManager.IsKeyDownOnce(SDLK_F1))
 		l->SwitchWireframeVisibility();
@@ -211,10 +211,15 @@ void MainGame::renderScene()
 // 	glm::mat3 inverseMatrix = glm::mat3(glm::inverseTranspose(camera.GetViewMatrix()));
 // 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
 
-	//set the camera matrix
+	//set the camera matrix(mvp)
 	GLint mvpLocation = colorProgram.GetUniformLocation("MVP");
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+
+	//set view matrix
+// 	GLint mvLocation = colorProgram.GetUniformLocation("MV");
+// 	glm::mat4 viewMatrix = camera.GetViewMatrix();
+// 	glUniformMatrix4fv(mvLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 
 	//actual drawing here
 	l->Render();
