@@ -29,10 +29,10 @@ namespace Engine
 			//insert it into the map
 			textureMap.insert(std::make_pair(texturePath, newTexture));
 
-			std::cout<<"Load Texture!\n";
+			//std::cout<<"Load Texture!\n";
 			return newTexture;
 		}
-		std::cout<<"Used Cached Texture!\n";
+		//std::cout<<"Used Cached Texture!\n";
 		return mit->second;
 	}
 }

@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-	void fatalError(char* msg)
+	void fatalError(std::string msg)
 	{
 		std::cout<<msg<<'\n';
 		system("pause");

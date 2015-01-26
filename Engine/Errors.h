@@ -1,6 +1,7 @@
 #pragma once
+#include <string>
 
 namespace Engine
 {
-	extern void fatalError(char* msg);
+	extern void fatalError(std::string msg);
 }

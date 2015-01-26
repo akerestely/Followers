@@ -1,7 +1,6 @@
 #include "GLSLProgram.h"
 
 #include <fstream>
-#include <string>
 #include <vector>
 
 #include "Errors.h"
@@ -83,11 +82,11 @@ namespace Engine
 	glBindAttribLocation(programId, numAtrtrib++, attribName);
 }
 
-	GLint GLSLProgram::GetUniformLocation( const char* uniformName )
+	GLint GLSLProgram::GetUniformLocation( const std::string uniformName )
 {
-	GLint location=glGetUniformLocation(programId, uniformName);
+	GLint location=glGetUniformLocation(programId, uniformName.c_str());
 	if(location == GL_INVALID_INDEX)
-		fatalError ( "Uniform not found in shader");
+		fatalError ( std::string("Uniform \"") + uniformName + std::string("\" not found in shader"));
 	return location;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <string>
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 
 		void AddAttribute(const char* attribName);
 
-		GLint GetUniformLocation( const char* uniformName);
+		GLint GetUniformLocation( const std::string uniformName);
 
 		void Use();
 		void UnUse();
