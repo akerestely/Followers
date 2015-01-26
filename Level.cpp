@@ -163,13 +163,14 @@ Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_UNSIGNED_SHORT_5_6_5, COL, ROW, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, img);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COL, ROW, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, img);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	shaderProgram->Use();
 	//upload heightMap uniform
 	GLint heightMapLocation = shaderProgram->GetUniformLocation("heightMap");
-	glUniform1f(heightMapLocation, 9);
+	glUniform1i(heightMapLocation, 7);
 
 	//upload multiplier, used to decompress heights
 	GLint multiplyerLocation = shaderProgram->GetUniformLocation("multiplier");
@@ -180,6 +181,8 @@ Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : 
 	glUniform1f(rowMultiplyerLocation, 1/(ROW*CELL_SIZE));
 	GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colMultiplier");
 	glUniform1f(colMultiplyerLocation, 1/(COL*CELL_SIZE*cosMeridian));
+
+	shaderProgram->UnUse();
 
 	printf("Uploaded map!\n");
 }
@@ -199,7 +202,7 @@ void Level::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,Engine::ResourceMngr::GetTexture("Textures/PNG/ground.png").id);
 
- 	glActiveTexture(GL_TEXTURE9);
+ 	glActiveTexture(GL_TEXTURE7);
  	glBindTexture(GL_TEXTURE_2D,heightMapId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
@@ -339,7 +342,7 @@ unsigned short* Level::makeHeightMap(float &multiplier)
 	unsigned short* img = new unsigned short[ROW*COL];
 	for (int i=0; i<ROW; i++)
 		for(int j=0; j<COL; j++)
-			img[i*COL + j] = levelData[i*nCols + j] * multiplier;
+			img[i*COL + j] = 0;// levelData[i*nCols + j] * multiplier;
 	return img;
 }
 
