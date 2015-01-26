@@ -41,7 +41,7 @@ void MainGame::initSystems()
 
 	fpsLimiter.Init(maxFps);
 
-	l=new Level("Resources/Map/imgn45w114_1");
+	l=new Level("Resources/Map/imgn45w114_1",&colorProgram);
 	//remove
 	m = new Model();
 	lightPos = glm::vec3(0,2000,0);
@@ -198,10 +198,12 @@ void MainGame::renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	colorProgram.Use();
-	//glActiveTexture(GL_TEXTURE0);
+	
 
-	//GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
-	//glUniform1i(textureLocation, 0);
+	GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
+	glUniform1i(textureLocation, 0);
+// 	GLint textureLocation2 = colorProgram.GetUniformLocation("mySampler2");
+// 	glUniform1i(textureLocation2, 1);
 
 	//move light
 	GLint lightPosLocation = colorProgram.GetUniformLocation("lightPos");
@@ -232,7 +234,7 @@ void MainGame::renderScene()
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 	m->Render();
 
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();
 
 	window.SwappBuffer();

@@ -1,8 +1,10 @@
 #include "Level.h"
 
 #include <fstream>
+#include <limits>
 
 #include "Engine/Errors.h"
+#include "Engine/ResourceMngr.h"
 #include <stddef.h>
 
 #define kMERIDIAN_LENGTH_METERS   20003930.0
@@ -10,13 +12,15 @@
 #define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
 #define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
 
-const int ROW = 1212;
-const int COL = 1212;
+const int ROW = 256;
+const int COL = 256;
 const double CELL_SIZE = 10;
 
-Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
+Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : shaderProgram(nullptr), nCols(0), nRows(0), levelData(nullptr)
 {
-	//initialization
+	this->shaderProgram = shaderProgram;
+
+	//additional initialization
 	vboId = iboId = vboIdWireframe = iboIdWireframe = 0;
 	showWireframe = false;
 
@@ -48,6 +52,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 			float y = levelData[(z)*nCols + x];
 			vertexData[z*COL + x].SetPosition(x*CELL_SIZE*cosMeridian, y, z*CELL_SIZE);
 			vertexData[z*COL + x].color = getColorByHeight(y);
+			vertexData[z*COL + x].SetUV(x%2,z%2);
 		}
 
 	//calculate vertex normals based on triangles formed with adjacent vertexes
@@ -149,6 +154,33 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	delete[] wireframeElements;
 
+	//generate and upload height map to shader
+	float multiplier;	
+	unsigned short *img = makeHeightMap(multiplier);
+	glGenTextures(1, &heightMapId);
+
+	glBindTexture(GL_TEXTURE_2D, heightMapId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_UNSIGNED_SHORT_5_6_5, COL, ROW, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, img);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//upload heightMap uniform
+	GLint heightMapLocation = shaderProgram->GetUniformLocation("heightMap");
+	glUniform1f(heightMapLocation, 9);
+
+	//upload multiplier, used to decompress heights
+	GLint multiplyerLocation = shaderProgram->GetUniformLocation("multiplier");
+	glUniform1f(multiplyerLocation, multiplier);
+
+	//upload multipliers, used to skew world coordinates to texture coordinates
+	GLint rowMultiplyerLocation = shaderProgram->GetUniformLocation("rowMultiplier");
+	glUniform1f(rowMultiplyerLocation, 1/(ROW*CELL_SIZE));
+	GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colMultiplier");
+	glUniform1f(colMultiplyerLocation, 1/(COL*CELL_SIZE*cosMeridian));
+
 	printf("Uploaded map!\n");
 }
 
@@ -164,6 +196,12 @@ void Level::SwitchWireframeVisibility()
 
 void Level::Render()
 {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D,Engine::ResourceMngr::GetTexture("Textures/PNG/ground.png").id);
+
+ 	glActiveTexture(GL_TEXTURE9);
+ 	glBindTexture(GL_TEXTURE_2D,heightMapId);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -180,7 +218,7 @@ void Level::Render()
 
 	if(showWireframe)
 	{
-		//draw wireframe
+		//draw wire frame
 		glPolygonOffset(1, 1);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
@@ -219,6 +257,7 @@ void Level::Render()
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D,0);
 }
 
 double Level::GetHeight(glm::vec2 point2d)
@@ -260,7 +299,6 @@ Engine::ColorRGBA8 Level::getColorByHeight(float height)
 	cRes.a = (c2.a - c1.a) * t + c1.a;
 	return cRes;
 }
-
 Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine::Position p3)
 {
 	Engine::Position a, b;
@@ -276,6 +314,33 @@ Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine:
 	normal.z = (a.x * b.y) - (a.y * b.x); 
 
 	return normal;
+}
+
+void Level::getMaxMinHeight(float &maxHeight, float &minHeight)
+{
+	maxHeight = INT_MIN;
+	minHeight = INT_MAX;
+	for (int i=0; i<nRows; i++)
+		for(int j=0; j<nCols; j++)
+		{
+			float x = levelData[i*nCols + j];
+			if(x<minHeight)
+				minHeight = x;
+			if(x>maxHeight)
+				maxHeight = x;
+		}
+}
+unsigned short* Level::makeHeightMap(float &multiplier)
+{
+	float maxH,minH;
+	getMaxMinHeight(maxH,minH);
+	multiplier = USHRT_MAX / (maxH-minH); 
+
+	unsigned short* img = new unsigned short[ROW*COL];
+	for (int i=0; i<ROW; i++)
+		for(int j=0; j<COL; j++)
+			img[i*COL + j] = levelData[i*nCols + j] * multiplier;
+	return img;
 }
 
 void Level::readAscFile(const std::string &fileName)
