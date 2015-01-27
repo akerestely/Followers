@@ -163,7 +163,7 @@ Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COL, ROW, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, img);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA16, COL, ROW, 0, GL_ALPHA, GL_UNSIGNED_SHORT, img);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -342,7 +342,7 @@ unsigned short* Level::makeHeightMap(float &multiplier)
 	unsigned short* img = new unsigned short[ROW*COL];
 	for (int i=0; i<ROW; i++)
 		for(int j=0; j<COL; j++)
-			img[i*COL + j] = 0;// levelData[i*nCols + j] * multiplier;
+			img[i*COL + j] = levelData[i*nCols + j] * multiplier;
 	return img;
 }
 

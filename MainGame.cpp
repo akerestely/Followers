@@ -198,10 +198,9 @@ void MainGame::renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	colorProgram.Use();
-	
 
-	GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
-	glUniform1i(textureLocation, 0);
+	//GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
+	//glUniform1i(textureLocation, 0);
 // 	GLint textureLocation2 = colorProgram.GetUniformLocation("mySampler2");
 // 	glUniform1i(textureLocation2, 1);
 

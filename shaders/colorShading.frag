@@ -22,9 +22,9 @@ void main()
 	
 	//get neighbouring points
 	//!!!!!!watch for left and upper margin
-	vec3 leftLowerPoint  = vec3(fragmentPosition.x - 0.5, 0, fragmentPosition.z + 0.5);
-	vec3 rightLowerPoint = vec3(fragmentPosition.x + 0.5, 0, fragmentPosition.z + 0.5);
-	vec3 rightUpperPoint = vec3(fragmentPosition.x + 0.5, 0, fragmentPosition.z - 0.5);
+	vec3 leftLowerPoint  = vec3(fragmentPosition.x - 0.1, 0, fragmentPosition.z + 0.1);
+	vec3 rightLowerPoint = vec3(fragmentPosition.x + 0.1, 0, fragmentPosition.z + 0.1);
+	vec3 rightUpperPoint = vec3(fragmentPosition.x + 0.1, 0, fragmentPosition.z - 0.1);
 	
 	//get colour from texture for each neighbour
 	vec4 llpColor = texture2D(heightMap, vec2(leftLowerPoint.x*colMultiplier, leftLowerPoint.z*rowMultiplier));
@@ -32,9 +32,26 @@ void main()
 	vec4 rupColor = texture2D(heightMap, vec2(rightUpperPoint.x*colMultiplier, rightUpperPoint.z*rowMultiplier));
 	
 	//get back height from colour
-	leftLowerPoint.y  = ((llpColor.r * 31 * 64 + llpColor.g * 63) * 32 + llpColor.b * 31)/multiplier;
-	rightLowerPoint.y = ((rlpColor.r * 31 * 64 + rlpColor.g * 63) * 32 + rlpColor.b * 31)/multiplier;
-	rightUpperPoint.y = ((rupColor.r * 31 * 64 + rupColor.g * 63) * 32 + rupColor.b * 31)/multiplier;
+	leftLowerPoint.y  = (llpColor.a * 65535)/multiplier;
+	rightLowerPoint.y = (rlpColor.a * 65535)/multiplier;
+	rightUpperPoint.y = (rupColor.a * 65535)/multiplier;
+	
+	
+	//testing
+	
+	// vec4 test = texture2D(heightMap, vec2(359.8151*colMultiplier, 500*rowMultiplier));
+	// float h = test.a * 65535 / multiplier;
+	// float e=4;
+	// if(1674.8358-e<h && h<1674.8358+e)
+		// discard;
+		
+	vec4 test = texture2D(heightMap, vec2(1079.4456*colMultiplier, 1500*rowMultiplier));
+	float h = test.a * 65535 / multiplier;
+	float e=1.9;
+	if(1310.9917-e<h && h<1310.9917+e)
+		discard;
+	
+	//end testing
 	
 	//compute normal for triangle based on the 3 neighbouring points
 	vec3 A = leftLowerPoint - rightLowerPoint;
@@ -47,6 +64,6 @@ void main()
 	vec3 lightVector = normalize(lightPos - fragmentPosition);
 	float diffuse = max(0.3, dot(fragmentNormal2, lightVector));
 	//attenuate light
-	//diffuse = diffuse * (1.0 / (1.0 + 0.00001*dist*dist));
-	gl_FragColor = fragmentColor * textureColor * vec4(lightColor*diffuse, 1.0);
+	//diffuse = diffuse * (1.0 / (1.0 + 0.000001*dist*dist));
+	gl_FragColor = fragmentColor * vec4(lightColor*diffuse, 1.0);
 }
