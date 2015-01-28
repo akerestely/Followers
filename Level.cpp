@@ -179,12 +179,19 @@ Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : 
 	glUniform1f(multiplyerLocation, multiplier);
 
 	//upload multipliers, used to skew world coordinates to texture coordinates
-	GLint rowMultiplyerLocation = shaderProgram->GetUniformLocation("rowMultiplier");
-	glUniform1f(rowMultiplyerLocation, 1/(ROW*CELL_SIZE));
-	GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colMultiplier");
-	glUniform1f(colMultiplyerLocation, 1/(COL*CELL_SIZE*cosMeridian));
+	GLint rowMultiplyerLocation = shaderProgram->GetUniformLocation("rowSize");
+	glUniform1f(rowMultiplyerLocation, CELL_SIZE);
+	GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colSize");
+	glUniform1f(colMultiplyerLocation, CELL_SIZE*cosMeridian);
+
+	GLint nRowsLocation = shaderProgram->GetUniformLocation("nRows");
+	glUniform1f(nRowsLocation, ROW);
+	GLint nColsLocation = shaderProgram->GetUniformLocation("nCols");
+	glUniform1f(nColsLocation, COL);
 
 	shaderProgram->UnUse();
+
+	GetHeight(glm::vec2(100,153));
 
 	printf("Uploaded map!\n");
 }
