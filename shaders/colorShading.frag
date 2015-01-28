@@ -32,26 +32,9 @@ void main()
 	vec4 rupColor = texture2D(heightMap, vec2(rightUpperPoint.x*colMultiplier, rightUpperPoint.z*rowMultiplier));
 	
 	//get back height from colour
-	leftLowerPoint.y  = (llpColor.a * 65535)/multiplier;
-	rightLowerPoint.y = (rlpColor.a * 65535)/multiplier;
-	rightUpperPoint.y = (rupColor.a * 65535)/multiplier;
-	
-	
-	//testing
-	
-	// vec4 test = texture2D(heightMap, vec2(359.8151*colMultiplier, 500*rowMultiplier));
-	// float h = test.a * 65535 / multiplier;
-	// float e=4;
-	// if(1674.8358-e<h && h<1674.8358+e)
-		// discard;
-		
-	vec4 test = texture2D(heightMap, vec2(1079.4456*colMultiplier, 1500*rowMultiplier));
-	float h = test.a * 65535 / multiplier;
-	float e=1.9;
-	if(1310.9917-e<h && h<1310.9917+e)
-		discard;
-	
-	//end testing
+	leftLowerPoint.y  = (llpColor.r * 65535)/multiplier;
+	rightLowerPoint.y = (rlpColor.r * 65535)/multiplier;
+	rightUpperPoint.y = (rupColor.r * 65535)/multiplier;
 	
 	//compute normal for triangle based on the 3 neighbouring points
 	vec3 A = leftLowerPoint - rightLowerPoint;
