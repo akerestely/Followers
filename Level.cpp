@@ -49,151 +49,151 @@ Level::Level(const std::string &fileName, Engine::GLSLProgram *shaderProgram) : 
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{
-			float y = levelData[(z)*nCols + x];
+			float y = int(levelData[(z)*nCols + x]);
 			vertexData[z*COL + x].SetPosition(x*CELL_SIZE*cosMeridian, y, z*CELL_SIZE);
 			vertexData[z*COL + x].color = getColorByHeight(y);
 			vertexData[z*COL + x].SetUV(x%2,z%2);
 		}
 
-	//calculate vertex normals based on triangles formed with adjacent vertexes
-	//interior
-	for(int z=1; z<ROW-1; z++)
-		for (int x=1; x<COL-1; x++)
-		{
-			Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x-1].position);
-			Engine::Position centerUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
-			Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x+1].position);
-			Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x+1].position);
-			Engine::Position centerLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
-			Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x-1].position);
-			//Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
-			//Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
-			vertexData[z*ROW + x].normal = (leftUpper + centerUpper + rightUpper + rightLower + centerLower + leftLower);
-			vertexData[z*ROW + x].normal.Normalize();
-		}
-	//TODO corners
-	//first and last row
-	//first and last column
-	//upload to GPU
-	glGenBuffers(1, &vboId);
-	glBindBuffer(GL_ARRAY_BUFFER, vboId);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL, vertexData,GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//calculate vertex normals based on triangles formed with adjacent vertexes
+		//interior
+		for(int z=1; z<ROW-1; z++)
+			for (int x=1; x<COL-1; x++)
+			{
+				Engine::Position leftUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x].position, vertexData[z*ROW + x-1].position);
+				Engine::Position centerUpper = normal(vertexData[z*ROW + x].position, vertexData[(z-1)*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+				Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x+1].position);
+				Engine::Position rightLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x].position, vertexData[z*ROW + x+1].position);
+				Engine::Position centerLower = normal(vertexData[z*ROW + x].position, vertexData[(z+1)*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
+				Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x-1].position);
+				//Engine::Position leftLower = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x-1].position, vertexData[(z+1)*ROW + x].position);
+				//Engine::Position rightUpper = normal(vertexData[z*ROW + x].position, vertexData[z*ROW + x+1].position, vertexData[(z-1)*ROW + x].position);
+				vertexData[z*ROW + x].normal = (leftUpper + centerUpper + rightUpper + rightLower + centerLower + leftLower);
+				vertexData[z*ROW + x].normal.Normalize();
+			}
+			//TODO corners
+			//first and last row
+			//first and last column
+			//upload to GPU
+			glGenBuffers(1, &vboId);
+			glBindBuffer(GL_ARRAY_BUFFER, vboId);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL, vertexData,GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	//set color for wire frame vertex, and upload to GPU
-	Engine::ColorRGBA8 wireframeColor(0,0,0,255);
-	for(int z=0; z<ROW; z++)
-		for (int x=0; x<COL; x++)
-			vertexData[z*COL + x].color = wireframeColor;
-	glGenBuffers(1, &vboIdWireframe);
-	glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL,vertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+			//set color for wire frame vertex, and upload to GPU
+			Engine::ColorRGBA8 wireframeColor(0,0,0,255);
+			for(int z=0; z<ROW; z++)
+				for (int x=0; x<COL; x++)
+					vertexData[z*COL + x].color = wireframeColor;
+			glGenBuffers(1, &vboIdWireframe);
+			glBindBuffer(GL_ARRAY_BUFFER, vboIdWireframe);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL,vertexData, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	//upload data for normals
-	Engine::Vertex *normalsData = new Engine::Vertex[ROW * COL *2];
-	for(int z=0,i=0; z<ROW; z++)
-		for (int x=0; x<COL; x++)
-		{
-			normalsData[i++].position = vertexData[z*COL +x].position;
-			normalsData[i++].position = vertexData[z*COL +x].position + vertexData[z*COL +x].normal*5;
-		}
-	glGenBuffers(1, &vboNormals);
-	glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL*2,normalsData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	delete[] normalsData;
-	delete[] vertexData;
+			//upload data for normals
+			Engine::Vertex *normalsData = new Engine::Vertex[ROW * COL *2];
+			for(int z=0,i=0; z<ROW; z++)
+				for (int x=0; x<COL; x++)
+				{
+					normalsData[i++].position = vertexData[z*COL +x].position;
+					normalsData[i++].position = vertexData[z*COL +x].position + vertexData[z*COL +x].normal*5;
+				}
+				glGenBuffers(1, &vboNormals);
+				glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::Vertex)*ROW * COL*2,normalsData, GL_STATIC_DRAW);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				delete[] normalsData;
+				delete[] vertexData;
 
-	//assign triangle indices. Two triangles at once, that form a rectangle.
-	unsigned int *mapElements = new unsigned int[(COL-1)*(ROW-1)*2*3];
-	for(int i=0,k=0; i<ROW-1; i++)
-		for(int j=0; j<COL-1; j++)
-		{
-			mapElements[k++] = i*COL + j;
-			mapElements[k++] = (i+1)*COL + j;
-			mapElements[k++] = i*COL + j+1;
+				//assign triangle indices. Two triangles at once, that form a rectangle.
+				unsigned int *mapElements = new unsigned int[(COL-1)*(ROW-1)*2*3];
+				for(int i=0,k=0; i<ROW-1; i++)
+					for(int j=0; j<COL-1; j++)
+					{
+						mapElements[k++] = i*COL + j;
+						mapElements[k++] = (i+1)*COL + j;
+						mapElements[k++] = i*COL + j+1;
 
- 			mapElements[k++] = i*COL + j+1;
- 			mapElements[k++] = (i+1)*COL + j;
- 			mapElements[k++] = (i+1)*COL + j+1;
-		}
-	glGenBuffers(1, &iboId);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(COL-1)*(ROW-1)*2*3, mapElements, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	delete[] mapElements;
+						mapElements[k++] = i*COL + j+1;
+						mapElements[k++] = (i+1)*COL + j;
+						mapElements[k++] = (i+1)*COL + j+1;
+					}
+					glGenBuffers(1, &iboId);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(COL-1)*(ROW-1)*2*3, mapElements, GL_STATIC_DRAW);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+					delete[] mapElements;
 
-	//assign line indices.
-	unsigned int *wireframeElements =new unsigned int[(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2];
-	int k=0;
-	//horizontal
-	for(int i=0; i<ROW; i++)
-		for(int j=0; j<COL-1; j++)
-		{
-			wireframeElements[k++] = i*COL + j;
-			wireframeElements[k++] = i*COL + j+1;
-		}
-	//vertical
-	for(int j=0; j<COL; j++)
-		for(int i=0; i<ROW-1; i++)
-		{
-			wireframeElements[k++] = i*COL + j;
-			wireframeElements[k++] = (i+1)*COL + j;
-		}
-	//diagonal
-	for(int i=0; i<ROW-1; i++)
-		for(int j=0; j<COL-1; j++)
-		{
-			wireframeElements[k++] = i*COL + j+1;
-			wireframeElements[k++] = (i+1)*COL + j;
-		}
-	glGenBuffers(1, &iboIdWireframe);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboIdWireframe);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2, wireframeElements, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	delete[] wireframeElements;
+					//assign line indices.
+					unsigned int *wireframeElements =new unsigned int[(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2];
+					int k=0;
+					//horizontal
+					for(int i=0; i<ROW; i++)
+						for(int j=0; j<COL-1; j++)
+						{
+							wireframeElements[k++] = i*COL + j;
+							wireframeElements[k++] = i*COL + j+1;
+						}
+						//vertical
+						for(int j=0; j<COL; j++)
+							for(int i=0; i<ROW-1; i++)
+							{
+								wireframeElements[k++] = i*COL + j;
+								wireframeElements[k++] = (i+1)*COL + j;
+							}
+							//diagonal
+							for(int i=0; i<ROW-1; i++)
+								for(int j=0; j<COL-1; j++)
+								{
+									wireframeElements[k++] = i*COL + j+1;
+									wireframeElements[k++] = (i+1)*COL + j;
+								}
+								glGenBuffers(1, &iboIdWireframe);
+								glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboIdWireframe);
+								glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(ROW*(COL-1)+COL*(ROW-1)+(ROW-1)*(COL-1))*2, wireframeElements, GL_STATIC_DRAW);
+								glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+								delete[] wireframeElements;
 
-	//generate and upload height map to shader
-	float multiplier;	
-	unsigned short *img = makeHeightMap(multiplier);
-	glGenTextures(1, &heightMapId);
+								//generate and upload height map to shader
+								float multiplier;	
+								unsigned short *img = makeHeightMap(multiplier);
+								glGenTextures(1, &heightMapId);
 
-	glBindTexture(GL_TEXTURE_2D, heightMapId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+								glBindTexture(GL_TEXTURE_2D, heightMapId);
+								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, COL, ROW, 0, GL_RED, GL_UNSIGNED_SHORT, img);
+								glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, COL, ROW, 0, GL_RED, GL_UNSIGNED_SHORT, img);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+								glBindTexture(GL_TEXTURE_2D, 0);
 
-	shaderProgram->Use();
-	//upload heightMap uniform
-	GLint heightMapLocation = shaderProgram->GetUniformLocation("heightMap");
-	glUniform1i(heightMapLocation, 7);
+								shaderProgram->Use();
+								//upload heightMap uniform
+								GLint heightMapLocation = shaderProgram->GetUniformLocation("heightMap");
+								glUniform1i(heightMapLocation, 7);
 
-	//upload multiplier, used to decompress heights
-	GLint multiplyerLocation = shaderProgram->GetUniformLocation("multiplier");
-	glUniform1f(multiplyerLocation, multiplier);
+								//upload multiplier, used to decompress heights
+								GLint multiplyerLocation = shaderProgram->GetUniformLocation("multiplier");
+								glUniform1f(multiplyerLocation, multiplier);
 
-	//upload multipliers, used to skew world coordinates to texture coordinates
-	GLint rowMultiplyerLocation = shaderProgram->GetUniformLocation("rowSize");
-	glUniform1f(rowMultiplyerLocation, CELL_SIZE);
-	GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colSize");
-	glUniform1f(colMultiplyerLocation, CELL_SIZE*cosMeridian);
+								//upload multipliers, used to skew world coordinates to texture coordinates
+								GLint rowMultiplyerLocation = shaderProgram->GetUniformLocation("rowSize");
+								glUniform1f(rowMultiplyerLocation, CELL_SIZE);
+								GLint colMultiplyerLocation = shaderProgram->GetUniformLocation("colSize");
+								glUniform1f(colMultiplyerLocation, CELL_SIZE*cosMeridian);
 
-	GLint nRowsLocation = shaderProgram->GetUniformLocation("nRows");
-	glUniform1f(nRowsLocation, ROW);
-	GLint nColsLocation = shaderProgram->GetUniformLocation("nCols");
-	glUniform1f(nColsLocation, COL);
+								GLint nRowsLocation = shaderProgram->GetUniformLocation("nRows");
+								glUniform1f(nRowsLocation, ROW);
+								GLint nColsLocation = shaderProgram->GetUniformLocation("nCols");
+								glUniform1f(nColsLocation, COL);
 
-	shaderProgram->UnUse();
+								shaderProgram->UnUse();
 
-	GetHeight(glm::vec2(100,153));
+								GetHeight(glm::vec2(100,153));
 
-	printf("Uploaded map!\n");
+								printf("Uploaded map!\n");
 }
 
 Level::~Level(void)
@@ -211,8 +211,8 @@ void Level::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,Engine::ResourceMngr::GetTexture("Textures/PNG/ground.png").id);
 
- 	glActiveTexture(GL_TEXTURE7);
- 	glBindTexture(GL_TEXTURE_2D,heightMapId);
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D,heightMapId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glEnableVertexAttribArray(0);
@@ -347,6 +347,7 @@ unsigned short* Level::makeHeightMap(float &multiplier)
 	float maxH,minH;
 	getMaxMinHeight(maxH,minH);
 	multiplier = USHRT_MAX / (maxH-minH); 
+	multiplier = 1;
 
 	unsigned short* img = new unsigned short[ROW*COL];
 	for (int i=0; i<ROW; i++)

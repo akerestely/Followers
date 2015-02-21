@@ -17,7 +17,7 @@ uniform sampler2D heightMap;
 
 uniform vec3 lightPos;
 
-float getHeight(vec2 point2d)
+float getHeight2(vec2 point2d)
 {
 	//get grid(texture) boundaries
 	int x1 = int(point2d.x/colSize);
@@ -38,37 +38,76 @@ float getHeight(vec2 point2d)
 	return fFinal;
 }
 
+ float Triangular( float f )
+{
+	f = f / 2.0;
+	if( f < 0.0 )
+	{
+		return ( f + 1.0 );
+	}
+	else
+	{
+		return ( 1.0 - f );
+	}
+	return 0.0;
+}
+
+float getHeight( vec2 tc )
+{
+	vec2 TexCoord = tc;
+	float fWidth = nRows, fHeight = nCols;
+	TexCoord.x = TexCoord.x / colSize / nCols; TexCoord.y = TexCoord.y / rowSize / nRows;
+    float texelSizeX = 1.0 / fWidth; //size of one texel 
+    float texelSizeY = 1.0 / fHeight; //size of one texel 
+    float nSum = 0.0;
+    float nDenom = 0.0;
+    float a = fract( TexCoord.x * fWidth * multiplier); // get the decimal part
+    float b = fract( TexCoord.y * fHeight * multiplier); // get the decimal part
+    for( int m = -1; m <=2; m++ )
+    {
+        for( int n =-1; n<= 2; n++)
+        {
+			float vecData = texture2D(heightMap, 
+                               TexCoord + vec2(texelSizeX * float( m ), 
+					texelSizeY * float( n ))).r * 65535;
+			float f  = Triangular( float( m ) - a );
+			float vecCooef1 = f;
+			float f1 = Triangular ( -( float( n ) - b ) );
+			float vecCoeef2 = f1;
+            nSum = nSum + ( vecData * vecCoeef2 * vecCooef1  );
+            nDenom = nDenom + (( vecCoeef2 * vecCooef1 ));
+        }
+    }
+    return nSum / nDenom;
+}
+
 void main()
 {	
 	vec4 textureColor = texture2D(mySampler, fragmentUV);
 	vec4 textureColor2 = texture2D(mySampler2, fragmentUV);
 	
+	vec3 test = fragmentPosition;
+	//test.x = 3.6;
+	//test.z = 30 + 0.02;
+	//test.y = 0;
+
 	//get neighbouring points
 	//!!!!!optimize using  MAD!!!
 	//!!!!!!watch for left and upper margin
-	vec3 leftLowerPoint  = vec3(fragmentPosition.x - 0.5, 0, fragmentPosition.z + 0.5);
-	vec3 rightLowerPoint = vec3(fragmentPosition.x + 0.5, 0, fragmentPosition.z + 0.5);
-	vec3 rightUpperPoint = vec3(fragmentPosition.x + 0.5, 0, fragmentPosition.z - 0.5);
+	vec3 leftLowerPoint  = vec3(test.x - 7.2, 0, test.z + 10);
+	vec3 rightLowerPoint = vec3(test.x + 7.2, 0, test.z + 10);
+	vec3 rightUpperPoint = vec3(test.x + 7.2, 0, test.z - 10);
 	
 	//get back height from colour
 	leftLowerPoint.y  = getHeight(leftLowerPoint.xz);
 	rightLowerPoint.y = getHeight(rightLowerPoint.xz);
 	rightUpperPoint.y = getHeight(rightUpperPoint.xz);
-	
-	// if(rightUpperPoint.y == rightLowerPoint.y)
-	//	discard;
-	// if(leftLowerPoint.y == rightLowerPoint.y && rightLowerPoint.y == rightUpperPoint.y)
-	// 	discard;
-	
-	// float h = getHeight(vec2(100,153));
-	// float e = 5;
-	// float rez = 1871.9640;
-	// if(rez-e < h && h > rez+e)
-		// discard;
+
+	vec2 test2 = vec2( 7.2 * 3, 10 * 3);
+	float height = getHeight( test2);
+	if( height < 1800)
+	discard;
 		
-	// if(getHeight(fragmentPosition.xz) > 1700)
-		// discard;
-	
 	//compute normal for triangle based on the 3 neighbouring points
 	vec3 A = leftLowerPoint - rightLowerPoint;
 	vec3 B = rightLowerPoint - rightUpperPoint;
@@ -76,9 +115,10 @@ void main()
 
 	//light computation
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
-	//float dist = length(lightPos - fragmentPosition);
-	vec3 lightVector = normalize(lightPos - fragmentPosition);
+	//float dist = length(lightPos - test);
+	vec3 lightVector = normalize(lightPos - test);
 	float diffuse = max(0.3, dot(fragmentNormal2, lightVector));
+
 	//attenuate light
 	//diffuse = diffuse * (1.0 / (1.0 + 0.000001*dist*dist));
 	gl_FragColor = fragmentColor * vec4(lightColor*diffuse, 1.0);
