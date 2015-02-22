@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <Engine/ModelLoader.h>
 //
 
 MainGame::MainGame(void) :
@@ -43,6 +44,7 @@ void MainGame::initSystems()
 
 	l=new Level("Resources/Map/imgn45w114_1");
 	//remove
+	mesh = Engine::ModelLoader::LoadAssimp("Resources/Grass pack/Grass_01.obj");
 	m = new Model();
 	lightPos = glm::vec3(0,2000,0);
 	//
@@ -230,7 +232,8 @@ void MainGame::renderScene()
 	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
 	cameraMatrix = glm::translate(cameraMatrix, lightPos);
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
-	m->Render();
+	//m->Render();
+	mesh.Render();
 
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();

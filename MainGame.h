@@ -10,7 +10,8 @@
 #include "Level.h"
 
 //remove
-#include "Engine\Model.h"
+#include "Engine/Model.h"
+#include "Engine/Mesh.h"
 //
 
 enum GameState {PLAY,EXIT}; 
@@ -45,6 +46,7 @@ private:
 	Model *m;
 
 	//remove
+	Engine::Mesh mesh;
 	glm::vec3 movement;
 	glm::vec3 lightPos;
 	//

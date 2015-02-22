@@ -94,6 +94,13 @@ namespace Engine
 			position.z=z;
 		}
 
+		void SetNormal(float x, float y, float z)
+		{
+			normal.x=x;
+			normal.y=y;
+			normal.z=z;
+		}
+
 		void SetColor(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 		{
 			color.r = r;
