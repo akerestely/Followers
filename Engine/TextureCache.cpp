@@ -24,7 +24,7 @@ namespace Engine
 		if(mit == textureMap.end())
 		{
 			//load the texture
-			GLTexture newTexture = ImageLoader::LoadPNG(texturePath);
+			GLTexture newTexture = ImageLoader::LoadSoil(texturePath);
 
 			//insert it into the map
 			textureMap.insert(std::make_pair(texturePath, newTexture));

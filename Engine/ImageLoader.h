@@ -8,6 +8,7 @@ namespace Engine
 	{
 	public:
 		static GLTexture LoadPNG(char* filepPath);
+		static GLTexture LoadSoil(char* filePath);
 	};
 }
 
