@@ -4,7 +4,7 @@ namespace Engine
 {
 	TextureCache ResourceMngr::textureCache;
 
-	GLTexture ResourceMngr::GetTexture(char* texturePath)
+	Engine::GLTexture ResourceMngr::GetTexture(const char* texturePath)
 	{
 		return textureCache.GetTexture(texturePath);
 	}

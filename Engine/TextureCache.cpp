@@ -15,7 +15,7 @@ namespace Engine
 	{
 	}
 
-	GLTexture TextureCache::GetTexture(char* texturePath)
+	Engine::GLTexture TextureCache::GetTexture(const char* texturePath)
 	{
 		//lookup for texture and see if its there
 		auto mit = textureMap.find(texturePath);

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Mesh.h"
+#include "Model.h"
 
 namespace Engine
 {
 	class ModelLoader
 	{
 	public:
-		static Mesh LoadAssimp(char* filePath);
+		static Model* LoadAssimp(char* filePath);
 	};
 }
 

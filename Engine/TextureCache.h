@@ -11,9 +11,9 @@ namespace Engine
 		TextureCache(void);
 		~TextureCache(void);
 
-		GLTexture GetTexture(char* texturePath);
+		GLTexture GetTexture(const char* texturePath);
 	private:
-		std::map<char*, GLTexture> textureMap;
+		std::map<const char*, GLTexture> textureMap;
 	};
 }
 

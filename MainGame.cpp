@@ -44,8 +44,8 @@ void MainGame::initSystems()
 
 	l=new Level("Resources/Map/imgn45w114_1");
 	//remove
-	mesh = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/Grass_01.obj");
-	m = new Model();
+	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
+	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.lwo");
 	lightPos = glm::vec3(0,2000,0);
 	//
 	glClearColor(0.5,0.5,0.5,0.5);
@@ -202,8 +202,8 @@ void MainGame::renderScene()
 	colorProgram.Use();
 	//glActiveTexture(GL_TEXTURE0);
 
-	//GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
-	//glUniform1i(textureLocation, 0);
+	GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
+	glUniform1i(textureLocation, 0);
 
 	//move light
 	GLint lightPosLocation = colorProgram.GetUniformLocation("lightPos");
@@ -232,8 +232,7 @@ void MainGame::renderScene()
 	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
 	cameraMatrix = glm::translate(cameraMatrix, lightPos);
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
-	//m->Render();
-	mesh.Render();
+	m->Render();
 
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	colorProgram.UnUse();

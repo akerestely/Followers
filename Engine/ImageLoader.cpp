@@ -47,7 +47,7 @@ namespace Engine
 		return texture;
 	}
 
-	Engine::GLTexture ImageLoader::LoadSoil(char* filePath)
+	Engine::GLTexture ImageLoader::LoadSoil(const char* filePath)
 	{
 		GLTexture texture = {};
 		//load image with SOIL

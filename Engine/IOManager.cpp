@@ -26,4 +26,21 @@ namespace Engine
 		file.read((char*)&(buffer[0]), fileSize);
 		return true;
 	}
+
+	std::string IOManager::GetPath(std::string filePath)
+	{
+		std::string::size_type SlashIndex = filePath.find_last_of("/");
+		std::string dir;
+
+		if (SlashIndex == std::string::npos) {
+			dir = ".";
+		}
+		else if (SlashIndex == 0) {
+			dir = "/";
+		}
+		else {
+			dir = filePath.substr(0, SlashIndex);
+		}
+		return dir;
+	}
 }

@@ -43,7 +43,7 @@ private:
 	float fps;
 
 	Level *l;
-	Model *m;
+	Engine::Model *m;
 
 	//remove
 	Engine::Mesh mesh;
