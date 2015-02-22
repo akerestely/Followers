@@ -44,7 +44,7 @@ void MainGame::initSystems()
 
 	l=new Level("Resources/Map/imgn45w114_1");
 	//remove
-	mesh = Engine::ModelLoader::LoadAssimp("Resources/Grass pack/Grass_01.obj");
+	mesh = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/Grass_01.obj");
 	m = new Model();
 	lightPos = glm::vec3(0,2000,0);
 	//

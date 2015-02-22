@@ -1,6 +1,7 @@
 #include "ModelLoader.h"
 
 #include "Vertex.h"
+#include "Errors.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -16,7 +17,7 @@ namespace Engine
 		const aiScene* scene = importer.ReadFile(filePath, 
 			aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  | aiProcess_GenSmoothNormals | aiProcess_FlipUVs );
 		if(!scene)
-			printf("Error parsing '%s': '%s'\n", filePath, importer.GetErrorString());
+			fatalError("Error parsing'" + std::string(filePath) + "': " +std::string(importer.GetErrorString()));
 
 		//array containing meshes
 		std::vector<Mesh> meshes(scene->mNumMeshes);
