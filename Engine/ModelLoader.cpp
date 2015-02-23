@@ -17,7 +17,7 @@ namespace Engine
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filePath, 
-			aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals );
+			aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 		if(!scene)
 			fatalError("Error parsing'" + std::string(filePath) + "': " +std::string(importer.GetErrorString()));
 

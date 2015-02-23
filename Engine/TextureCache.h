@@ -1,7 +1,9 @@
 #pragma once
-#include <map>
 
 #include "GLTexture.h"
+
+#include <map>
+#include <string>
 
 namespace Engine
 {
@@ -13,7 +15,7 @@ namespace Engine
 
 		GLTexture GetTexture(const char* texturePath);
 	private:
-		std::map<const char*, GLTexture> textureMap;
+		std::map<std::string, GLTexture> textureMap;
 	};
 }
 
