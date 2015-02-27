@@ -44,7 +44,7 @@ namespace Engine
 				const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 
 				vertices[i].SetPosition(pos->x, pos->y, pos->z);
-				vertices[i].position = vertices[i].position *100;
+				//vertices[i].position = vertices[i].position *100;
 				vertices[i].SetNormal(normal->x, normal->y, normal->z);
 				vertices[i].SetUV(uv->x, uv->y);
 				vertices[i].SetColor(50,200,30,255);

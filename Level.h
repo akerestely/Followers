@@ -15,12 +15,15 @@ public:
 	void Render();
 
 	double GetHeight(glm::vec2 point2d);
+	void GetMaxMinHeight(float &maxHeight, float &minHeight);
 
 	~Level(void);
 private:
 	void readBinaryData(const std::string &fileName);
 	void readAscFile(const std::string &fileName);
 	void writeToBinary(const std::string &fileName,unsigned int nCols=0U, unsigned int nRows=0U);
+
+	
 
 	Engine::ColorRGBA8 getColorByHeight(float height);
 	Engine::Position Level::normal(Engine::Position p1, Engine::Position p2, Engine::Position p3);

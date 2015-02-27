@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "Engine/Errors.h"
+#include "Engine/ResourceMngr.h"
 #include <stddef.h>
 
 #define kMERIDIAN_LENGTH_METERS   20003930.0
@@ -10,8 +11,8 @@
 #define kWGS_UNIT_TO_METER   ( kMERIDIAN_LENGTH_METERS / kMERIDIAN_LENGTH_WGS_UNITS )
 #define kMETER_TO_WGS_UNIT   ( 1.0 / kWGS_UNIT_TO_METER )
 
-const int ROW = 1212;
-const int COL = 1212;
+const int ROW = 212;
+const int COL = 212;
 const double CELL_SIZE = 10;
 
 Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullptr)
@@ -48,6 +49,7 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 			float y = levelData[(z)*nCols + x];
 			vertexData[z*COL + x].SetPosition(x*CELL_SIZE*cosMeridian, y, z*CELL_SIZE);
 			vertexData[z*COL + x].color = getColorByHeight(y);
+			vertexData[z*COL + x].SetUV(x,z);
 		}
 
 	//calculate vertex normals based on triangles formed with adjacent vertexes
@@ -164,6 +166,13 @@ void Level::SwitchWireframeVisibility()
 
 void Level::Render()
 {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/sand.jpg").id);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/grass2.png").id);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/rock.jpg").id);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -180,7 +189,7 @@ void Level::Render()
 
 	if(showWireframe)
 	{
-		//draw wireframe
+		//draw wire frame
 		glPolygonOffset(1, 1);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
@@ -242,6 +251,21 @@ double Level::GetHeight(glm::vec2 point2d)
 		f10 * px * (1.0 - py) + f01 * (1.0 - px) * py + f11 * px * py;
 
 	return fFinal;
+}
+
+void Level::GetMaxMinHeight(float &maxHeight, float &minHeight)
+{
+	maxHeight = INT_MIN;
+	minHeight = INT_MAX;
+	for (int i=0; i<ROW; i++)
+		for(int j=0; j<COL; j++)
+		{
+			float x = levelData[i*nCols + j];
+			if(x<minHeight)
+				minHeight = x;
+			if(x>maxHeight)
+				maxHeight = x;
+		}
 }
 
 Engine::ColorRGBA8 Level::getColorByHeight(float height)

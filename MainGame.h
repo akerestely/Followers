@@ -33,7 +33,8 @@ private:
 	int screenWidth,screenHeight;
 	GameState gameState;
 
-	Engine::GLSLProgram colorProgram;
+	Engine::GLSLProgram terrainProgram;
+	Engine::GLSLProgram modelProgram;
 	Engine::CameraSpectator camera;
 
 	Engine::InputManager inputManager;

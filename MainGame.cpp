@@ -43,9 +43,26 @@ void MainGame::initSystems()
 	fpsLimiter.Init(maxFps);
 
 	l=new Level("Resources/Map/imgn45w114_1");
+
 	//remove
+	terrainProgram.Use();
+	GLint textureLocation = terrainProgram.GetUniformLocation("mySampler0");
+	glUniform1i(textureLocation, 0);
+	textureLocation = terrainProgram.GetUniformLocation("mySampler1");
+	glUniform1i(textureLocation, 1);
+	textureLocation = terrainProgram.GetUniformLocation("mySampler2");
+	glUniform1i(textureLocation, 2);
+
+	float maxHeight, minHeight;
+	l->GetMaxMinHeight(maxHeight, minHeight);
+	GLint heightLocation = terrainProgram.GetUniformLocation("maxHeight");
+	glUniform1f(heightLocation, maxHeight);
+	heightLocation = terrainProgram.GetUniformLocation("minHeight");
+	glUniform1f(heightLocation, minHeight);
+	terrainProgram.UnUse();
+
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
-	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.lwo");
+	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
 	lightPos = glm::vec3(0,2000,0);
 	//
 	glClearColor(0.5,0.5,0.5,0.5);
@@ -57,12 +74,19 @@ void MainGame::initSystems()
 void MainGame::initShaders()
 {
 	//warning!!! order matters!!!
-	colorProgram.CompileShaders("shaders/colorShading.vert","shaders/colorShading.frag");
-	colorProgram.AddAttribute("vertexPosition");
-	colorProgram.AddAttribute("vertexNormal");
-	colorProgram.AddAttribute("vertexColor");
-	//colorProgram.AddAttribute("vertexUV");
-	colorProgram.LinkShader();
+	terrainProgram.CompileShaders("shaders/terrainShading.vert","shaders/terrainShading.frag");
+	terrainProgram.AddAttribute("vertexPosition");
+	terrainProgram.AddAttribute("vertexNormal");
+	terrainProgram.AddAttribute("vertexColor");
+	terrainProgram.AddAttribute("vertexUV");
+	terrainProgram.LinkShader();
+
+	modelProgram.CompileShaders("shaders/modelShading.vert","shaders/modelShading.frag");
+	modelProgram.AddAttribute("vertexPosition");
+	modelProgram.AddAttribute("vertexNormal");
+	modelProgram.AddAttribute("vertexColor");
+	modelProgram.AddAttribute("vertexUV");
+	modelProgram.LinkShader();
 }
 
 void MainGame::gameLoop()
@@ -199,14 +223,10 @@ void MainGame::renderScene()
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	colorProgram.Use();
-	//glActiveTexture(GL_TEXTURE0);
 
-	GLint textureLocation = colorProgram.GetUniformLocation("mySampler");
-	glUniform1i(textureLocation, 0);
-
+	terrainProgram.Use();	
 	//move light
-	GLint lightPosLocation = colorProgram.GetUniformLocation("lightPos");
+	GLint lightPosLocation = terrainProgram.GetUniformLocation("lightPos");
 	glUniform3fv(lightPosLocation, 1, &lightPos[0]);
 	//set the inverse matrix
 // 	GLint inverseMatrixLocation = colorProgram.GetUniformLocation("inverseMatrix");
@@ -214,8 +234,8 @@ void MainGame::renderScene()
 // 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
 
 	//set the camera matrix(mvp)
-	GLint mvpLocation = colorProgram.GetUniformLocation("MVP");
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
+	GLint mvpLocation = terrainProgram.GetUniformLocation("MVP");
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 
 	//set view matrix
@@ -225,17 +245,24 @@ void MainGame::renderScene()
 
 	//actual drawing here
 	l->Render();
+	terrainProgram.UnUse();
 
 	//move cube
+	modelProgram.Use();
+	lightPosLocation = modelProgram.GetUniformLocation("lightPos");
+	glUniform3fv(lightPosLocation, 1, &lightPos[0]);
 	//movement.x+=0.1;
 	//movement.z+=0.1;
 	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
-	cameraMatrix = glm::translate(cameraMatrix, lightPos);
+	cameraMatrix = glm::translate(cameraMatrix, movement);
+	mvpLocation = modelProgram.GetUniformLocation("MVP");
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
 	m->Render();
+	modelProgram.UnUse();
 
 	//glBindTexture(GL_TEXTURE_2D, 0);
-	colorProgram.UnUse();
 
 	window.SwappBuffer();
 }

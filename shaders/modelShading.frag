@@ -20,5 +20,5 @@ void main()
 	float diffuse = max(0.1, dot(fragmentNormal, lightVector));
 	//atenuate light
 	//diffuse = diffuse * (1.0 / (1.0 + 0.00001*dist*dist));
-	gl_FragColor = fragmentColor * textureColor * vec4(lightColor*diffuse, 1.0);
+	gl_FragColor = textureColor * vec4(lightColor*diffuse, 1.0);
 }
