@@ -17,9 +17,10 @@ namespace Engine
 		void Rotate(const glm::vec3 &rot) { rotation += rot; needsUpdate = true;}
 
 		//Getters
-		const glm::mat4 &GetCameraMatrix() { return cameraMatrix; }
-		const glm::mat4 &GetViewMatrix() { return viewMatrix; }
-		const glm::mat4 &GetProjectionMatrix() { return projectionMatrix; }
+		const glm::vec3 &GetPosition() const { return position; }
+		const glm::mat4 &GetCameraMatrix() const { return cameraMatrix; }
+		const glm::mat4 &GetViewMatrix() const { return viewMatrix; }
+		const glm::mat4 &GetProjectionMatrix() const { return projectionMatrix; }
 	private:
 		int screenWidth, screeHeight;
 

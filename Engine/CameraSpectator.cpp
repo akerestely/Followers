@@ -32,7 +32,7 @@ namespace Engine
 	{
 		this->screenWidth = screenWidth;
 		this->screeHeight = screeHeight;
-		projectionMatrix = glm::perspective(45.0f, (float)screenWidth/screeHeight, 0.5f, 100000.0f);
+		projectionMatrix = glm::perspective(45.0f, (float)screenWidth/screeHeight, 0.125f, 10000.0f);
 	}
 
 	void CameraSpectator::Update()
