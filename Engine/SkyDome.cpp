@@ -135,6 +135,7 @@ namespace Engine
 
 		skyProgram->Use();
 		//constants for uniforms
+		//for details on constants see: http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter16.html
 		const float Kr = 0.0030f;
 		const float Km = 0.0015f;
 		const float ESun = 16.0f;

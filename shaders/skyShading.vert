@@ -1,19 +1,10 @@
+// Atmospheric scattering vertex shader
+// Author: Sean O'Neil
+// Copyright (c) 2004 Sean O'Neil
+
 #version 120
 
 attribute vec3 vertexPosition;
-attribute vec3 vertexNormal;
-attribute vec4 vertexColor;
-attribute vec2 vertexUV;
-
-varying vec3 fragmentPosition;
-varying vec3 fragmentNormal;
-varying vec4 fragmentColor;
-varying vec4 fragmentColorSecondary;
-varying vec2 fragmentUV;
-
-uniform mat4 M;
-uniform mat4 MV;
-uniform mat4 MVP;
 
 uniform vec3 v3CameraPos;			// The camera's current position
 uniform vec3 v3LightPos;			// The direction vector to the light source
@@ -27,10 +18,12 @@ uniform float fKm4PI;				// Km * 4 * PI
 uniform float fScale;				// 1 / (fOuterRadius - fInnerRadius)
 uniform float fScaleDepth;			// The scale depth (i.e. the altitude at which the atmosphere's average density is found)
 uniform float fScaleOverScaleDepth;	// fScale / fScaleDepth
-
 uniform int Samples;
+uniform mat4 MVP;					// Model-View-Projection matrix
 
 varying vec3 v3Direction;
+varying vec4 fragmentColor;
+varying vec4 fragmentColorSecondary;
 
 float scale(float fCos)
 {
@@ -73,8 +66,6 @@ void main()
 		v3SamplePoint += v3SampleRay;
 	}
 
-	//if(v3FrontColor.r == 0 && v3FrontColor.g == 0 &&v3FrontColor.b == 0) v3FrontColor = vertexColor.rgb;
-	
 	// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
 	fragmentColorSecondary.rgb = v3FrontColor * fKmESun;
 	fragmentColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
