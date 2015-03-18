@@ -7,7 +7,6 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
 #include <Engine/ModelLoader.h>
 //
 
@@ -61,14 +60,16 @@ void MainGame::initSystems()
 	glUniform1f(heightLocation, minHeight);
 	terrainProgram.UnUse();
 
+	sky = new Engine::SkyDome;
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
 	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
-	lightPos = glm::vec3(0,2000,0);
+	lightPos = glm::vec3(-473, -163.0f, 107.0f);
+	//lightPos = glm::vec3(0, 2000, 0);
 	//
 	glClearColor(0.5,0.5,0.5,0.5);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
-	//glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);
 }
 
 void MainGame::initShaders()
@@ -223,6 +224,12 @@ void MainGame::renderScene()
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//set the camera matrix(mvp)
+	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
+	GLint mvpLocation;
+
+
+	sky->Render(camera, lightPos);
 
 	terrainProgram.Use();	
 	//move light
@@ -234,8 +241,7 @@ void MainGame::renderScene()
 // 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
 
 	//set the camera matrix(mvp)
-	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
-	GLint mvpLocation = terrainProgram.GetUniformLocation("MVP");
+	mvpLocation = terrainProgram.GetUniformLocation("MVP");
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
 
 	//set view matrix

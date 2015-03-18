@@ -12,6 +12,7 @@
 //remove
 #include "Engine/Model.h"
 #include "Engine/Mesh.h"
+#include "Engine/SkyDome.h"
 //
 
 enum GameState {PLAY,EXIT}; 
@@ -35,6 +36,7 @@ private:
 
 	Engine::GLSLProgram terrainProgram;
 	Engine::GLSLProgram modelProgram;
+
 	Engine::CameraSpectator camera;
 
 	Engine::InputManager inputManager;
@@ -45,6 +47,7 @@ private:
 
 	Level *l;
 	Engine::Model *m;
+	Engine::SkyDome *sky;
 
 	//remove
 	Engine::Mesh mesh;

@@ -100,6 +100,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="ResourceMngr.cpp" />
+    <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="Timing.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -118,6 +119,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="ResourceMngr.h" />
+    <ClInclude Include="SkyDome.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="Timing.h" />
     <ClInclude Include="Vertex.h" />
