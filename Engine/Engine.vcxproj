@@ -101,6 +101,7 @@
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="ResourceMngr.cpp" />
     <ClCompile Include="SkyDome.cpp" />
+    <ClCompile Include="Sun.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="Timing.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="ResourceMngr.h" />
     <ClInclude Include="SkyDome.h" />
+    <ClInclude Include="Sun.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="Timing.h" />
     <ClInclude Include="Vertex.h" />

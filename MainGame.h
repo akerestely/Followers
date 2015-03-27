@@ -13,6 +13,7 @@
 #include "Engine/Model.h"
 #include "Engine/Mesh.h"
 #include "Engine/SkyDome.h"
+#include "Engine/Sun.h"
 //
 
 enum GameState {PLAY,EXIT}; 
@@ -48,6 +49,7 @@ private:
 	Level *l;
 	Engine::Model *m;
 	Engine::SkyDome *sky;
+	Engine::Sun *sun;
 
 	//remove
 	Engine::Mesh mesh;

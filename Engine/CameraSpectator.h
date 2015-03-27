@@ -18,6 +18,7 @@ namespace Engine
 
 		//Getters
 		const glm::vec3 &GetPosition() const { return position; }
+		const glm::vec3 &GetRotation() const { return rotation; }
 		const glm::mat4 &GetCameraMatrix() const { return cameraMatrix; }
 		const glm::mat4 &GetViewMatrix() const { return viewMatrix; }
 		const glm::mat4 &GetProjectionMatrix() const { return projectionMatrix; }

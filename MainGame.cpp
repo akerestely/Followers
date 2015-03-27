@@ -61,6 +61,7 @@ void MainGame::initSystems()
 	terrainProgram.UnUse();
 
 	sky = new Engine::SkyDome;
+	sun = new Engine::Sun();
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
 	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
 	lightPos = glm::vec3(-473, -163.0f, 107.0f);
@@ -228,8 +229,9 @@ void MainGame::renderScene()
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
 	GLint mvpLocation;
 
-
+	sun->position = lightPos;
 	sky->Render(camera, lightPos);
+	sun->Render(camera);
 
 	terrainProgram.Use();	
 	//move light

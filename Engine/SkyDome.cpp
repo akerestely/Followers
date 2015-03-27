@@ -3,7 +3,6 @@
 #include "Vertex.h"
 
 #include <vector>
-#include <math.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
