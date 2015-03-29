@@ -35,27 +35,7 @@ namespace Engine
 		glGenTextures(2, texIdDepth);
 		glGenTextures(2, texIdColor);
 
-		//build textures
-		for(unsigned int i=0; i<2; i++)
-		{
-			glBindTexture(GL_TEXTURE_2D, texIdDepth[i]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		for(unsigned int i=0; i<2; i++)
-		{
-			glBindTexture(GL_TEXTURE_2D, texIdColor[i]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
+		Resize(screenWidth, screenHeight);
 	}
 
 	Sun::~Sun(void)
@@ -117,6 +97,31 @@ namespace Engine
 		renderRect();		
 		radialBlurProgram->UnUse();
 		glDisable(GL_BLEND);
+	}
+
+	void Sun::Resize(int screenWidth, int screenHeight)
+	{
+		//build textures
+		for(unsigned int i=0; i<2; i++)
+		{
+			glBindTexture(GL_TEXTURE_2D, texIdDepth[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		for(unsigned int i=0; i<2; i++)
+		{
+			glBindTexture(GL_TEXTURE_2D, texIdColor[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 	}
 
 	void Sun::buildModel()
@@ -222,7 +227,7 @@ namespace Engine
 		mvp = glm::rotate(mvp, -rotation.x, OX);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
 		//calculate color
-		glm::vec3 direction = glm::normalize(position);
+		glm::vec3 direction = glm::normalize(sunPosition);
 		float refractionFactor = 1.0f - sqrt(max(0.0f, direction.y));
 		glm::vec3 sunColor = 1.0f - baseColor * refractionFactor;
 		glUniform3fv(program->GetUniformLocation("sunColor"), 1, &sunColor[0]);

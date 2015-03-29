@@ -19,6 +19,11 @@ MainGame::MainGame(void) :
 	//empty
 }
 
+MainGame::~MainGame(void)
+{
+	//empty
+}
+
 void MainGame::Run()
 {
 	initSystems();
@@ -30,7 +35,7 @@ void MainGame::initSystems()
 {
 	Engine::Init();
 
-	window.Create("Followers", screenWidth, screenHeight, /*Engine::FULLSCREEN*/0);
+	window.Create("Followers", screenWidth, screenHeight, /*Engine::FULLSCREEN*/ 0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	initShaders();
@@ -134,6 +139,15 @@ void MainGame::processInput()
 				inputManager.SetMouseCoordsRel(evnt.motion.xrel, evnt.motion.yrel);
 			else
 				inputManager.SetMouseCoords(evnt.motion.x, evnt.motion.y);
+			break;
+		case SDL_WINDOWEVENT:
+			switch(evnt.window.event)
+			{
+			case SDL_WINDOWEVENT_RESIZED:
+				resize((int) evnt.window.data1, (int)evnt.window.data2);
+				printf("%dx%d\n",(int) evnt.window.data1, (int)evnt.window.data2);
+				break;
+			}
 			break;
 		}
 	}
@@ -267,6 +281,11 @@ void MainGame::renderScene()
 	window.SwappBuffer();
 }
 
-MainGame::~MainGame(void)
+void MainGame::resize(int screenWidth, int screenHeight)
 {
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
+	
+	camera.Init(screenWidth, screenHeight);
+	sun->Resize(screenWidth, screenHeight);
 }

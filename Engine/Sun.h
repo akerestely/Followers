@@ -14,6 +14,8 @@ namespace Engine
 		void Update(const CameraSpectator &camera);
 		void Render(const CameraSpectator &camera);
 
+		void Resize(int screenWidth, int screenHeight);
+
 		//getters and setters
 		const glm::vec3 GetSunPosition() { return sunPosition; }
 		const glm::vec3 GetPosition() { return position; }

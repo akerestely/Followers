@@ -31,6 +31,7 @@ private:
 	void processInput();
 	void update();
 	void renderScene();
+	void resize(int screenWidth, int screenHeight);
 
 	Engine::Window window;
 	int screenWidth,screenHeight;
