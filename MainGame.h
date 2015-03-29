@@ -29,6 +29,7 @@ private:
 	void initShaders();
 	void gameLoop();
 	void processInput();
+	void update();
 	void renderScene();
 
 	Engine::Window window;
@@ -54,7 +55,6 @@ private:
 	//remove
 	Engine::Mesh mesh;
 	glm::vec3 movement;
-	glm::vec3 lightPos;
 	//
 };
 

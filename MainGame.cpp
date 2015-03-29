@@ -11,8 +11,8 @@
 //
 
 MainGame::MainGame(void) :
-	screenWidth(1024),
-	screenHeight(768),
+	screenWidth(800),
+	screenHeight(640),
 	gameState(PLAY),
 	maxFps(60)
 {
@@ -61,14 +61,11 @@ void MainGame::initSystems()
 	terrainProgram.UnUse();
 
 	sky = new Engine::SkyDome;
-	sun = new Engine::Sun();
+	sun = new Engine::Sun(screenWidth, screenHeight);
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
 	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
-	lightPos = glm::vec3(-473, -163.0f, 107.0f);
-	//lightPos = glm::vec3(0, 2000, 0);
 	//
-	glClearColor(0.5,0.5,0.5,0.5);
-	//glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 }
@@ -76,14 +73,14 @@ void MainGame::initSystems()
 void MainGame::initShaders()
 {
 	//warning!!! order matters!!!
-	terrainProgram.CompileShaders("shaders/terrainShading.vert","shaders/terrainShading.frag");
+	terrainProgram.CompileShaders("shaders/terrainShading.vert", "shaders/terrainShading.frag");
 	terrainProgram.AddAttribute("vertexPosition");
 	terrainProgram.AddAttribute("vertexNormal");
 	terrainProgram.AddAttribute("vertexColor");
 	terrainProgram.AddAttribute("vertexUV");
 	terrainProgram.LinkShader();
 
-	modelProgram.CompileShaders("shaders/modelShading.vert","shaders/modelShading.frag");
+	modelProgram.CompileShaders("shaders/modelShading.vert", "shaders/modelShading.frag");
 	modelProgram.AddAttribute("vertexPosition");
 	modelProgram.AddAttribute("vertexNormal");
 	modelProgram.AddAttribute("vertexColor");
@@ -99,7 +96,7 @@ void MainGame::gameLoop()
 
 		processInput();
 
-		camera.Update();
+		update();
 		renderScene();
 
 		fps = fpsLimiter.End();
@@ -144,10 +141,12 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_ESCAPE))
 		gameState = EXIT;
 
-	if(inputManager.IsKeyDown(SDLK_LSHIFT))
+	if(inputManager.IsKeyDown(SDLK_LALT))
+		CAMERA_SPEED=10.0f;
+	else if(inputManager.IsKeyDown(SDLK_LSHIFT))
 		CAMERA_SPEED=100.0f;
 	else
-		CAMERA_SPEED=1.1f;
+		CAMERA_SPEED=1.0f;
 
 	if(inputManager.IsKeyDownOnce(SDLK_F1))
 		l->SwitchWireframeVisibility();
@@ -170,22 +169,8 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_c))
 		camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
-	//light movement
-	static const float LIGHT_SPEED = 5.0f;
-	if(inputManager.IsKeyDown(SDLK_UP))
-		lightPos.z-=LIGHT_SPEED;
-	if(inputManager.IsKeyDown(SDLK_DOWN))
-		lightPos.z+=LIGHT_SPEED;
-	if(inputManager.IsKeyDown(SDLK_LEFT))
-		lightPos.x-=LIGHT_SPEED;
-	if(inputManager.IsKeyDown(SDLK_RIGHT))
-		lightPos.x+=LIGHT_SPEED;
-	if(inputManager.IsKeyDown(SDLK_PAGEUP))
-		lightPos.y+=LIGHT_SPEED;
-	if(inputManager.IsKeyDown(SDLK_PAGEDOWN))
-		lightPos.y-=LIGHT_SPEED;
-
-	//std::cout<<lightPos.x<<" "<<lightPos.y<<" "<<lightPos.z<<"\n";
+	if(inputManager.IsKeyDown(SDLK_MINUS))
+		sun->Update(camera);
 
 	if(SDL_GetRelativeMouseMode() == SDL_TRUE)
 	{
@@ -220,6 +205,13 @@ void MainGame::processInput()
 	}
 }
 
+void MainGame::update()
+{
+	camera.Update();
+
+	sun->Update(camera);
+}
+
 void MainGame::renderScene()
 {
 	glClearDepth(1.0);
@@ -229,14 +221,12 @@ void MainGame::renderScene()
 	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
 	GLint mvpLocation;
 
-	sun->position = lightPos;
-	sky->Render(camera, lightPos);
-	sun->Render(camera);
+	sky->Render(camera, sun->GetSunPosition());	
 
 	terrainProgram.Use();	
 	//move light
 	GLint lightPosLocation = terrainProgram.GetUniformLocation("lightPos");
-	glUniform3fv(lightPosLocation, 1, &lightPos[0]);
+	glUniform3fv(lightPosLocation, 1, &sun->GetPosition()[0]);
 	//set the inverse matrix
 // 	GLint inverseMatrixLocation = colorProgram.GetUniformLocation("inverseMatrix");
 // 	glm::mat3 inverseMatrix = glm::mat3(glm::inverseTranspose(camera.GetViewMatrix()));
@@ -258,7 +248,7 @@ void MainGame::renderScene()
 	//move cube
 	modelProgram.Use();
 	lightPosLocation = modelProgram.GetUniformLocation("lightPos");
-	glUniform3fv(lightPosLocation, 1, &lightPos[0]);
+	glUniform3fv(lightPosLocation, 1, &sun->GetPosition()[0]);
 	//movement.x+=0.1;
 	//movement.z+=0.1;
 	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
@@ -270,7 +260,9 @@ void MainGame::renderScene()
 	m->Render();
 	modelProgram.UnUse();
 
-	//glBindTexture(GL_TEXTURE_2D, 0);
+
+	//Sun must be rendered last for the depth test to be good
+	sun->Render(camera);
 
 	window.SwappBuffer();
 }

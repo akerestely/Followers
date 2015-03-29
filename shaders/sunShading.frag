@@ -1,6 +1,8 @@
 #version 120
 
+uniform vec3 sunColor;
+
 void main()
 {
-	gl_FragColor = vec4(1.0, 0.9, 0.8, 1.0);						
+	gl_FragColor = vec4(sunColor, 1.0);						
 }

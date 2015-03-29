@@ -17,6 +17,8 @@ namespace Engine
 		void Rotate(const glm::vec3 &rot) { rotation += rot; needsUpdate = true;}
 
 		//Getters
+		const int GetScreenWidth() const { return screenWidth; }
+		const int GetScreenHeight() const { return screeHeight; }
 		const glm::vec3 &GetPosition() const { return position; }
 		const glm::vec3 &GetRotation() const { return rotation; }
 		const glm::mat4 &GetCameraMatrix() const { return cameraMatrix; }
