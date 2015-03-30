@@ -7,13 +7,15 @@
 #include "Engine/InputManager.h"
 #include "Engine/Timing.h"
 
+#include "Engine/SkyDome.h"
+#include "Engine/Sun.h"
+#include "Engine/Water.h"
+
 #include "Level.h"
 
 //remove
 #include "Engine/Model.h"
 #include "Engine/Mesh.h"
-#include "Engine/SkyDome.h"
-#include "Engine/Sun.h"
 //
 
 enum GameState {PLAY,EXIT}; 
@@ -52,10 +54,12 @@ private:
 	Engine::Model *m;
 	Engine::SkyDome *sky;
 	Engine::Sun *sun;
+	Engine::Water *water;
 
 	//remove
 	Engine::Mesh mesh;
 	glm::vec3 movement;
+	float time;
 	//
 };
 

@@ -67,6 +67,7 @@ void MainGame::initSystems()
 
 	sky = new Engine::SkyDome;
 	sun = new Engine::Sun(screenWidth, screenHeight);
+	water = new Engine::Water;
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
 	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
 	//
@@ -95,6 +96,7 @@ void MainGame::initShaders()
 
 void MainGame::gameLoop()
 {
+	time = 0;
 	while(gameState != EXIT)
 	{
 		fpsLimiter.Begin();
@@ -102,6 +104,7 @@ void MainGame::gameLoop()
 		processInput();
 
 		update();
+		time+=0.01;
 		renderScene();
 
 		fps = fpsLimiter.End();
@@ -237,7 +240,7 @@ void MainGame::renderScene()
 
 	sky->Render(camera, sun->GetSunPosition());	
 
-	terrainProgram.Use();	
+	terrainProgram.Use();
 	//move light
 	GLint lightPosLocation = terrainProgram.GetUniformLocation("lightPos");
 	glUniform3fv(lightPosLocation, 1, &sun->GetPosition()[0]);
@@ -274,6 +277,7 @@ void MainGame::renderScene()
 	m->Render();
 	modelProgram.UnUse();
 
+	water->Render(camera, time);
 
 	//Sun must be rendered last for the depth test to be good
 	sun->Render(camera);
