@@ -6,18 +6,20 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#define PI 3.14159265358979323846264338327950288
+#define PI (float)3.14159265358979323846264338327950288
+
+const unsigned int levels = 6U;
+const unsigned int nVertices = 10U; //per level
+const float bigRadius = 1.0f; 
+const float height = 0.25f;
+const float bottom = 10.0f;  //bottom of dome
 
 namespace Engine
 {
 	SkyDome::SkyDome() : skyProgram(nullptr), InnerRadius(10.0f)
 	{
-		const unsigned int nVertices=100; //per level
 		SimpleVertex center;
-		center.position.y = 10; //bottom of dome
-		const float bigRadius = 1.0f;
-		const float height = 0.25f;
-		const unsigned int levels = 16;
+		center.position.y = bottom;		
 
 		std::vector<SimpleVertex> vertices(1+nVertices*levels);
 		std::vector<unsigned int> indices(nVertices*3+nVertices*3*2*(levels-1));
@@ -25,10 +27,10 @@ namespace Engine
 		vertices[0].position.y += height; //top of dome
 
 		//generate vertices
-		const float slice = 2*PI/nVertices;
+		const float slice = 2.0f*PI/nVertices;
 		for(unsigned int level = 1, iVert=1; level<=levels; level++)
 		{
-			const float radius = bigRadius * sin(PI/2 * level/levels);
+			const float radius = bigRadius * sin(PI/2.0f * level/levels);
 			const float circleHeight = center.position.y + height * cos(PI/2 * level/levels);
 			for (unsigned int i=1; i<=nVertices; i++,iVert++)
 			{
@@ -81,13 +83,17 @@ namespace Engine
 		glGenBuffers(1, &iboId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-	}
 
+		//build bottom circle
+		buildBottom();
+	}
 
 	SkyDome::~SkyDome()
 	{
 		if(skyProgram)
 			delete skyProgram;
+		if(skyBottomProgram)
+			delete skyBottomProgram;
 	}
 
 	void SkyDome::Render(const CameraSpectator &camera, const glm::vec3 sunPos)
@@ -109,17 +115,25 @@ namespace Engine
 		glUniform3fv(skyProgram->GetUniformLocation("v3LightPos"), 1, &sunDir[0]);
 
 		//render sky dome
-		glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vboId);
-			glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::SimpleVertex), (void*)offsetof(Engine::SimpleVertex,position));
+		glBindBuffer(GL_ARRAY_BUFFER, vboId);
+		glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::SimpleVertex), (void*)offsetof(Engine::SimpleVertex,position));
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
-			int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+		int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
-			glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
-		glDisableVertexAttribArray(0);
+		glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 		skyProgram->UnUse();
+
+		skyBottomProgram->Use();
+		glUniform3fv(skyBottomProgram->GetUniformLocation("sunDir"), 1, &sunDir[0]);
+		glUniformMatrix4fv(skyBottomProgram->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
+		//render sky bottom
+		glBindBuffer(GL_ARRAY_BUFFER, vboIdBottom);
+		glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::SimpleVertex), (void*)offsetof(Engine::SimpleVertex,position));
+		glDrawArrays(GL_TRIANGLE_FAN, 0, nVertices+2);
+		skyBottomProgram->UnUse();
+
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -151,8 +165,8 @@ namespace Engine
 		glUniform1f(skyProgram->GetUniformLocation("fInnerRadius"), InnerRadius);
 		glUniform1f(skyProgram->GetUniformLocation("fKrESun"), Kr * ESun);
 		glUniform1f(skyProgram->GetUniformLocation("fKmESun"), Km * ESun);
-		glUniform1f(skyProgram->GetUniformLocation("fKr4PI"), Kr * 4.0f * (float)PI);
-		glUniform1f(skyProgram->GetUniformLocation("fKm4PI"), Km * 4.0f * (float)PI);
+		glUniform1f(skyProgram->GetUniformLocation("fKr4PI"), Kr * 4.0f * PI);
+		glUniform1f(skyProgram->GetUniformLocation("fKm4PI"), Km * 4.0f * PI);
 		glUniform1f(skyProgram->GetUniformLocation("fScale"), Scale);
 		glUniform1f(skyProgram->GetUniformLocation("fScaleDepth"), ScaleDepth);
 		glUniform1f(skyProgram->GetUniformLocation("fScaleOverScaleDepth"), ScaleOverScaleDepth);
@@ -160,5 +174,39 @@ namespace Engine
 		glUniform1f(skyProgram->GetUniformLocation("g2"), g * g);
 		glUniform1i(skyProgram->GetUniformLocation("Samples"), 4);
 		skyProgram->UnUse();
+
+		//skyBottomShading
+		skyBottomProgram = new GLSLProgram;
+		
+		//links shaders
+		skyBottomProgram->CompileShaders("shaders/skyBottomShading.vert","shaders/skyBottomShading.frag");
+		skyBottomProgram->AddAttribute("vertexPosition");
+		skyBottomProgram->LinkShader();
+	}
+
+	void SkyDome::buildBottom()
+	{
+		SimpleVertex center;
+		center.position.y = bottom;		
+
+		std::vector<SimpleVertex> vertices(1+nVertices+1);
+		std::vector<unsigned int> indices(nVertices*3);
+		vertices[0] = center;
+		vertices[0].position.y -= 0.150; // subtract a little more than near clipping
+
+		//generate vertices
+		const float slice = 2.0f*PI/nVertices;
+		const float circleHeight = center.position.y;
+		for (unsigned int i=0; i<=nVertices; i++)
+		{
+			float crtSlice = slice*i;
+			vertices[i+1].SetPosition(center.position.x + cos(crtSlice) * bigRadius,
+				circleHeight, center.position.z + sin(crtSlice) * bigRadius);
+		}
+
+		//upload to GPU
+		glGenBuffers(1, &vboIdBottom);
+		glBindBuffer(GL_ARRAY_BUFFER, vboIdBottom);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(SimpleVertex) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	}
 }

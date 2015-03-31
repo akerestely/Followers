@@ -100,6 +100,7 @@ namespace Engine
 		glUniform1f(program->GetUniformLocation("waveWidth"), waveWidth);
 		glUniform1f(program->GetUniformLocation("waveHeight"), waveHeight);
 		glUniform1i(program->GetUniformLocation("waterTexture"), 0);
+		glUniform1f(program->GetUniformLocation("fogDistance"), nRows * cellSize / 2);
 		program->UnUse();
 	}
 }

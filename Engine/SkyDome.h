@@ -16,9 +16,10 @@ namespace Engine
 
 	private:
 		void initShader();
+		void buildBottom();
 
-		unsigned int vboId, iboId;
-		GLSLProgram *skyProgram;
+		unsigned int vboId, iboId, vboIdBottom;
+		GLSLProgram *skyProgram, *skyBottomProgram;
 
 		//position of viewer in terms of sky dome
 		const float InnerRadius;
