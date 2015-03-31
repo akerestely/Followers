@@ -11,7 +11,7 @@ namespace Engine
 		Sun(int screenWidth, int screenHeight);
 		~Sun(void);
 
-		void Update(const CameraSpectator &camera);
+		void Update(const CameraSpectator &camera, float deltaTime);
 		void Render(const CameraSpectator &camera);
 
 		void Resize(int screenWidth, int screenHeight);

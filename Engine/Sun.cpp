@@ -24,7 +24,7 @@ namespace Engine
 		program(nullptr),
 		depthTestProgram(nullptr),
 		radialBlurProgram(nullptr),
-		sunPosition(glm::vec3(3000, 0, 0)),
+		sunPosition(glm::vec3(3000, -500, 0)),
 		position(sunPosition)
 	{
 		buildModel();
@@ -48,9 +48,9 @@ namespace Engine
 			delete radialBlurProgram;
 	}
 	
-	void Sun::Update(const CameraSpectator &camera)
+	void Sun::Update(const CameraSpectator &camera, float deltaTime)
 	{
-		sunPosition = glm::vec3(glm::rotate(sunPosition,0.01f,glm::vec3(0.0f, 0.0f, 1.0f)));
+		sunPosition = glm::vec3(glm::rotate(sunPosition, deltaTime, glm::vec3(0.0f, 0.0f, 1.0f)));
 		position = -camera.GetPosition() + sunPosition;
 	}
 
@@ -220,12 +220,20 @@ namespace Engine
 	{
 		program->Use();
 
+		//clipping plane
+		glEnable(GL_CLIP_PLANE0);
+		float plane[] = {0.0f, 1.0f, 0.0f, camera.GetPosition().y};
+		glUniform4fv(program->GetUniformLocation("clipPlane"), 1, plane);
+
 		//setting model-view matrix
 		glm::vec3 rotation = camera.GetRotation();
 		glm::mat4 mvp = glm::translate(camera.GetCameraMatrix(), position);
 		mvp = glm::rotate(mvp, -rotation.y, OY);
 		mvp = glm::rotate(mvp, -rotation.x, OX);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
+		//setting model matrix
+		glm::mat4 m = glm::translate(glm::mat4(1.0), position);
+		glUniformMatrix4fv(program->GetUniformLocation("M"), 1, GL_FALSE, &m[0][0]);
 		//calculate color
 		glm::vec3 direction = glm::normalize(sunPosition);
 		float refractionFactor = 1.0f - sqrt(max(0.0f, direction.y));
@@ -242,6 +250,9 @@ namespace Engine
 
 		glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
 		glDisableVertexAttribArray(0);
+
+		//disable clip plane
+		glDisable(GL_CLIP_PLANE0);
 
 		program->UnUse();
 	}

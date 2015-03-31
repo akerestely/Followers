@@ -186,8 +186,10 @@ void MainGame::processInput()
 	if(inputManager.IsKeyDown(SDLK_c))
 		camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
-	if(inputManager.IsKeyDown(SDLK_MINUS))
-		sun->Update(camera);
+	if(inputManager.IsKeyDown(SDLK_UP))
+		sun->Update(camera, 0.1f);
+	if(inputManager.IsKeyDown(SDLK_DOWN))
+		sun->Update(camera, -0.1f);
 
 	if(SDL_GetRelativeMouseMode() == SDL_TRUE)
 	{
@@ -226,7 +228,7 @@ void MainGame::update()
 {
 	camera.Update();
 
-	sun->Update(camera);
+	sun->Update(camera, 0.01);
 }
 
 void MainGame::renderScene()
