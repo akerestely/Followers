@@ -58,6 +58,22 @@ namespace Engine
 			// reduce to unit size 
 			*this /= len;
 		}
+		static Position Normal(Engine::Position p1, Engine::Position p2, Engine::Position p3)
+		{
+			Engine::Position a, b;
+			// calculate the vectors A and B
+			// note that p[3] is defined with counterclockwise winding in mind
+			a = p1 - p2; 
+			b = p2 - p3; 
+
+			// calculate the cross product
+			Engine::Position normal;
+			normal.x = (a.y * b.z) - (a.z * b.y); 
+			normal.y = (a.z * b.x) - (a.x * b.z); 
+			normal.z = (a.x * b.y) - (a.y * b.x); 
+
+			return normal;
+		}
 	};
 
 	struct ColorRGBA8
@@ -80,11 +96,11 @@ namespace Engine
 		}
 	};
 
+	// Vertex, containing position, normal, uv coordinates
 	struct Vertex
 	{
 		Position position;
 		Position normal;
-		ColorRGBA8 color;
 		UV uv;
 
 		void SetPosition(float x, float y, float z)
@@ -99,14 +115,6 @@ namespace Engine
 			normal.x=x;
 			normal.y=y;
 			normal.z=z;
-		}
-
-		void SetColor(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
-		{
-			color.r = r;
-			color.g = g;
-			color.b = b;
-			color.a = a;
 		}
 
 		void SetUV(float u, float v)

@@ -17,8 +17,10 @@ namespace Engine
 		void Resize(int screenWidth, int screenHeight);
 
 		//getters and setters
-		const glm::vec3 GetSunPosition() { return sunPosition; }
-		const glm::vec3 GetPosition() { return position; }
+
+		const glm::vec3 GetSunPosition() const { return sunPosition; } //relative to camera
+		const glm::vec3 GetPosition() const { return position; } //relative to scene
+		const glm::vec3 GetSunColor() const { return sunColor; }
 	private:
 		void buildModel();
 		void buildRect();
@@ -29,6 +31,7 @@ namespace Engine
 
 		glm::vec3 sunPosition;
 		glm::vec3 position;
+		glm::vec3 sunColor;
 
 		unsigned int vboId, iboId;
 		unsigned int vboIdRect, iboIdRect;

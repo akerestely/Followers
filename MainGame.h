@@ -2,7 +2,6 @@
 
 #include <Engine/Engine.h>
 #include <Engine/Window.h>
-#include <Engine/GLSLProgram.h>
 #include <Engine/CameraSpectator.h>
 #include "Engine/InputManager.h"
 #include "Engine/Timing.h"
@@ -12,10 +11,10 @@
 #include "Engine/Water.h"
 
 #include "Level.h"
+#include "LevelRenderer.h"
 
 //remove
 #include "Engine/Model.h"
-#include "Engine/Mesh.h"
 //
 
 enum GameState {PLAY,EXIT}; 
@@ -28,7 +27,6 @@ public:
 	~MainGame(void);
 private:
 	void initSystems();
-	void initShaders();
 	void gameLoop();
 	void processInput();
 	void update();
@@ -39,9 +37,6 @@ private:
 	int screenWidth,screenHeight;
 	GameState gameState;
 
-	Engine::GLSLProgram terrainProgram;
-	Engine::GLSLProgram modelProgram;
-
 	Engine::CameraSpectator camera;
 
 	Engine::InputManager inputManager;
@@ -51,13 +46,13 @@ private:
 	float fps;
 
 	Level *l;
-	Engine::Model *m;
+	LevelRenderer *levelRenderer;
 	Engine::SkyDome *sky;
 	Engine::Sun *sun;
 	Engine::Water *water;
+	Engine::Model *m;
 
 	//remove
-	Engine::Mesh mesh;
 	glm::vec3 movement;
 	float time;
 	//

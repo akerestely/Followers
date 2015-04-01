@@ -3,6 +3,9 @@
 #include "Mesh.h"
 
 #include <vector>
+#include "GLSLProgram.h"
+#include "CameraSpectator.h"
+#include "Sun.h"
 
 namespace Engine
 {
@@ -14,10 +17,15 @@ namespace Engine
 		Model(void);
 		~Model(void);
 
-		void Render();
+		void Render(const CameraSpectator &camera, const Sun *sun);
 	private:
+		void initShader();
+
+		glm::vec3 position;
+
 		std::vector<Mesh> meshes;
 		std::vector<int> materials;
+		GLSLProgram *program;
 	};
 }
 

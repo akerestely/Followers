@@ -52,6 +52,11 @@ namespace Engine
 	{
 		sunPosition = glm::vec3(glm::rotate(sunPosition, deltaTime, glm::vec3(0.0f, 0.0f, 1.0f)));
 		position = -camera.GetPosition() + sunPosition;
+
+		//calculate sun color
+		glm::vec3 direction = glm::normalize(sunPosition);
+		float refractionFactor = 1.0f - sqrt(max(0.0f, direction.y));
+		sunColor = 1.0f - baseColor * refractionFactor;
 	}
 
 	void Sun::Render(const CameraSpectator &camera)
@@ -234,10 +239,7 @@ namespace Engine
 		//setting model matrix
 		glm::mat4 m = glm::translate(glm::mat4(1.0), position);
 		glUniformMatrix4fv(program->GetUniformLocation("M"), 1, GL_FALSE, &m[0][0]);
-		//calculate color
-		glm::vec3 direction = glm::normalize(sunPosition);
-		float refractionFactor = 1.0f - sqrt(max(0.0f, direction.y));
-		glm::vec3 sunColor = 1.0f - baseColor * refractionFactor;
+		//update sun color
 		glUniform3fv(program->GetUniformLocation("sunColor"), 1, &sunColor[0]);
 
 		//render sun

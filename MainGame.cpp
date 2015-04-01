@@ -1,12 +1,10 @@
 #include "MainGame.h"
 
 #include <Engine/Errors.h>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <Engine/ImageLoader.h>
 //remove
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include <Engine/ModelLoader.h>
 //
 
@@ -38,8 +36,6 @@ void MainGame::initSystems()
 	window.Create("Followers", screenWidth, screenHeight, /*Engine::FULLSCREEN*/ 0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
-	initShaders();
-
 	camera.Init(screenWidth,screenHeight);
 	camera.Rotate(glm::vec3(0.0f, 180.0f, 0.0f));
 	camera.Move(glm::vec3(0.0f, 2300.f, 0.0f));
@@ -47,51 +43,19 @@ void MainGame::initSystems()
 	fpsLimiter.Init(maxFps);
 
 	l=new Level("Resources/Map/imgn45w114_1");
+	levelRenderer = new LevelRenderer(l);
 
 	//remove
-	terrainProgram.Use();
-	GLint textureLocation = terrainProgram.GetUniformLocation("mySampler0");
-	glUniform1i(textureLocation, 0);
-	textureLocation = terrainProgram.GetUniformLocation("mySampler1");
-	glUniform1i(textureLocation, 1);
-	textureLocation = terrainProgram.GetUniformLocation("mySampler2");
-	glUniform1i(textureLocation, 2);
-
-	float maxHeight, minHeight;
-	l->GetMaxMinHeight(maxHeight, minHeight);
-	GLint heightLocation = terrainProgram.GetUniformLocation("maxHeight");
-	glUniform1f(heightLocation, maxHeight);
-	heightLocation = terrainProgram.GetUniformLocation("minHeight");
-	glUniform1f(heightLocation, minHeight);
-	terrainProgram.UnUse();
-
 	sky = new Engine::SkyDome;
 	sun = new Engine::Sun(screenWidth, screenHeight);
 	water = new Engine::Water;
 	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
-	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.3ds");
+	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.lwo");
 	//
 	glClearColor(0.0,0.0,0.0,1.0);
+	glClearDepth(1.0);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
-}
-
-void MainGame::initShaders()
-{
-	//warning!!! order matters!!!
-	terrainProgram.CompileShaders("shaders/terrainShading.vert", "shaders/terrainShading.frag");
-	terrainProgram.AddAttribute("vertexPosition");
-	terrainProgram.AddAttribute("vertexNormal");
-	terrainProgram.AddAttribute("vertexColor");
-	terrainProgram.AddAttribute("vertexUV");
-	terrainProgram.LinkShader();
-
-	modelProgram.CompileShaders("shaders/modelShading.vert", "shaders/modelShading.frag");
-	modelProgram.AddAttribute("vertexPosition");
-	modelProgram.AddAttribute("vertexNormal");
-	modelProgram.AddAttribute("vertexColor");
-	modelProgram.AddAttribute("vertexUV");
-	modelProgram.LinkShader();
 }
 
 void MainGame::gameLoop()
@@ -165,8 +129,6 @@ void MainGame::processInput()
 	else
 		CAMERA_SPEED=1.0f;
 
-	if(inputManager.IsKeyDownOnce(SDLK_F1))
-		l->SwitchWireframeVisibility();
 	if(inputManager.IsKeyDownOnce(SDLK_F4))
 		window.Fullscreen(!window.IsFullscreen());
 
@@ -233,54 +195,14 @@ void MainGame::update()
 
 void MainGame::renderScene()
 {
-	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//set the camera matrix(mvp)
-	glm::mat4 cameraMatrix = camera.GetCameraMatrix();
-	GLint mvpLocation;
-
-	sky->Render(camera, sun->GetSunPosition());	
-
-	terrainProgram.Use();
-	//move light
-	GLint lightPosLocation = terrainProgram.GetUniformLocation("lightPos");
-	glUniform3fv(lightPosLocation, 1, &sun->GetPosition()[0]);
-	//set the inverse matrix
-// 	GLint inverseMatrixLocation = colorProgram.GetUniformLocation("inverseMatrix");
-// 	glm::mat3 inverseMatrix = glm::mat3(glm::inverseTranspose(camera.GetViewMatrix()));
-// 	glUniformMatrix3fv(inverseMatrixLocation, 1, GL_FALSE, &inverseMatrix[0][0]);
-
-	//set the camera matrix(mvp)
-	mvpLocation = terrainProgram.GetUniformLocation("MVP");
-	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
-
-	//set view matrix
-// 	GLint mvLocation = colorProgram.GetUniformLocation("MV");
-// 	glm::mat4 viewMatrix = camera.GetViewMatrix();
-// 	glUniformMatrix4fv(mvLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-
-	//actual drawing here
-	l->Render();
-	terrainProgram.UnUse();
-
-	//move cube
-	modelProgram.Use();
-	lightPosLocation = modelProgram.GetUniformLocation("lightPos");
-	glUniform3fv(lightPosLocation, 1, &sun->GetPosition()[0]);
-	//movement.x+=0.1;
-	//movement.z+=0.1;
-	movement.y=l->GetHeight(glm::vec2(movement.x, movement.z));
-	cameraMatrix = glm::translate(cameraMatrix, movement);
-	mvpLocation = modelProgram.GetUniformLocation("MVP");
-	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &cameraMatrix[0][0]);
-
-	glActiveTexture(GL_TEXTURE0);
-	m->Render();
-	modelProgram.UnUse();
+	sky->Render(camera, sun->GetSunPosition());
+	levelRenderer->Render(camera, sun);
+	
+	m->Render(camera, sun);
 
 	water->Render(camera, time);
-
 	//Sun must be rendered last for the depth test to be good
 	sun->Render(camera);
 
