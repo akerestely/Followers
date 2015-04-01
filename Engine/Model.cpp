@@ -3,10 +3,13 @@
 
 #include <stddef.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
+const  glm::vec3 OY(0.0f, 1.0f, 0.0f);
 
 namespace Engine
 {
-	Model::Model(void) : program(nullptr), position(glm::vec3(0.0))
+	Model::Model(void) : program(nullptr), position(glm::vec3(0.0)), rotateY(0)
 	{
 		//empty
 	}
@@ -22,9 +25,11 @@ namespace Engine
 		if(!program)
 			initShader();
 		program->Use();
-		glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sun->GetPosition()[0]);
+		glm::vec3 sunPos = glm::rotate(sun->GetPosition(), -rotateY, OY);
+		glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sunPos[0]);
 		glUniform3fv(program->GetUniformLocation("lightColor"), 1, &sun->GetSunColor()[0]);
-		glm::mat4 mvp = glm::translate(camera.GetCameraMatrix(), position);
+		glm::mat4 mvp = glm::rotate(camera.GetCameraMatrix(), rotateY, OY);
+		mvp = glm::translate(mvp, position);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 		glActiveTexture(GL_TEXTURE0);

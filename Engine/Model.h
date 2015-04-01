@@ -18,10 +18,12 @@ namespace Engine
 		~Model(void);
 
 		void Render(const CameraSpectator &camera, const Sun *sun);
+
+		//public variables
+		float RotateY;
+		glm::vec3 Position;
 	private:
 		void initShader();
-
-		glm::vec3 position;
 
 		std::vector<Mesh> meshes;
 		std::vector<int> materials;
