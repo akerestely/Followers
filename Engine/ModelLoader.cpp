@@ -13,7 +13,7 @@
 
 namespace Engine
 {
-	Engine::Model* ModelLoader::LoadAssimp(char* filePath)
+	Model* ModelLoader::LoadAssimp(char* filePath)
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filePath, 
@@ -38,12 +38,17 @@ namespace Engine
 			const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 			//iterate threw the mesh vertices and construct our vertices
+			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds");
 			for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++) {
 				const aiVector3D* pos = &(mesh->mVertices[i]);
 				const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &Zero3D;
 				const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 
-				vertices[i].SetPosition(pos->x, pos->y, pos->z);
+				if(flipYwithZ)
+					vertices[i].SetPosition(pos->x, pos->z, pos->y);
+				else
+					vertices[i].SetPosition(pos->x, pos->y, pos->z);
+				vertices[i].position = vertices[i].position * 100;
 				vertices[i].SetNormal(normal->x, normal->y, normal->z);
 				vertices[i].SetUV(uv->x, uv->y);
 			}

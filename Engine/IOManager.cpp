@@ -27,7 +27,7 @@ namespace Engine
 		return true;
 	}
 
-	std::string IOManager::GetPath(std::string filePath)
+	std::string IOManager::GetPath(const std::string filePath)
 	{
 		std::string::size_type SlashIndex = filePath.find_last_of("/");
 		std::string dir;
@@ -42,5 +42,19 @@ namespace Engine
 			dir = filePath.substr(0, SlashIndex);
 		}
 		return dir;
+	}
+
+	std::string IOManager::GetFileExtension(const std::string filePath)
+	{
+		std::string::size_type dotIndex = filePath.find_last_of(".");
+		std::string extension;
+
+		if (dotIndex == std::string::npos) {
+			extension = "";
+		}
+		else {
+			extension = filePath.substr(dotIndex);
+		}
+		return extension;
 	}
 }

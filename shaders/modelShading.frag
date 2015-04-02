@@ -12,7 +12,9 @@ uniform vec3 lightColor;
 void main()
 {							
 	vec4 textureColor = texture2D(mySampler, fragmentUV);
-	
+	//discards fragment in case texture has alpha less than 0.9 (example: PNG files)
+	if(textureColor.a < 0.9)
+		discard;
 	//frag shader 4
 	//float dist = length(lightPos - fragmentPosition);
 	vec3 lightVector = normalize(lightPos - fragmentPosition);

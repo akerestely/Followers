@@ -9,7 +9,7 @@ const  glm::vec3 OY(0.0f, 1.0f, 0.0f);
 
 namespace Engine
 {
-	Model::Model(void) : program(nullptr), position(glm::vec3(0.0)), rotateY(0)
+	Model::Model(void) : program(nullptr), Position(glm::vec3(0.0)), RotateY(0)
 	{
 		//empty
 	}
@@ -25,11 +25,11 @@ namespace Engine
 		if(!program)
 			initShader();
 		program->Use();
-		glm::vec3 sunPos = glm::rotate(sun->GetPosition(), -rotateY, OY);
+		glm::vec3 sunPos = glm::rotate(sun->GetPosition(), -RotateY, OY);
 		glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sunPos[0]);
 		glUniform3fv(program->GetUniformLocation("lightColor"), 1, &sun->GetSunColor()[0]);
-		glm::mat4 mvp = glm::rotate(camera.GetCameraMatrix(), rotateY, OY);
-		mvp = glm::translate(mvp, position);
+		glm::mat4 mvp = glm::translate(camera.GetCameraMatrix(), Position);
+		mvp = glm::rotate(mvp, RotateY, OY);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 		glActiveTexture(GL_TEXTURE0);
