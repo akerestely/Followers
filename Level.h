@@ -4,7 +4,7 @@
 
 const int ROW = 212;
 const int COL = 212;
-const float CELL_SIZE = 10.0;
+const float CELL_SIZE = 40.0;
 
 class Level
 {
@@ -16,10 +16,10 @@ public:
 	const float* GetData() const { return levelData; }
 	const unsigned int GetRows() const { return nRows; }
 	const unsigned int GetCols() const { return nCols; }
-	const float GetYLLCorner() const { return yllcorner; }
+	const float GetCosMeridian() const { return cosMeridian; }
 	const float GetMaxHeight() const { return maxHeight; }
 	const float GetMinHeight() const { return minHeight; }
-	double GetHeight(glm::vec2 point2d);
+	const float GetHeight(glm::vec2 point2d) const;
 private:
 	void readBinaryData(const std::string &fileName);
 	void readAscFile(const std::string &fileName);
@@ -29,7 +29,7 @@ private:
 
 	unsigned int nCols, nRows;
 	float xllcorner, yllcorner, cellsize, noData_value;
-	float maxHeight, minHeight;
+	float maxHeight, minHeight, cosMeridian;
 	float *levelData;
 };
 

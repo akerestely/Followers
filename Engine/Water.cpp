@@ -4,8 +4,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const unsigned int nRows = 100;
-const unsigned int nCols = 100;
+const unsigned int nRows = 200;
+const unsigned int nCols = 200;
 const float cellSize = 100;
 
 const float waveWidth = 200.6f;

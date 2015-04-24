@@ -27,7 +27,7 @@ void LevelRenderer::Render(const Engine::CameraSpectator &camera, const Engine::
 
 	program->Use();
 	//update uniforms
-	glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sun->GetPosition()[0]);
+	glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sun->GetSunPosition()[0]);
 	glUniform3fv(program->GetUniformLocation("lightColor"), 1, &sun->GetSunColor()[0]);
 	glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &camera.GetCameraMatrix()[0][0]);
 
@@ -48,7 +48,7 @@ void LevelRenderer::buildModel(const Level *level)
 
 	//construct vertex data based on level data
 	Engine::Vertex *vertices = new Engine::Vertex[ ROW * COL ];
-	double cosMeridian = cos(level->GetYLLCorner()*PI/180);
+	double cosMeridian = level->GetCosMeridian();
 	for(int z=0; z<ROW; z++)
 		for (int x=0; x<COL; x++)
 		{

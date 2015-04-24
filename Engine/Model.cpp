@@ -25,7 +25,7 @@ namespace Engine
 		if(!program)
 			initShader();
 		program->Use();
-		glm::vec3 sunPos = glm::rotate(sun->GetPosition(), -RotateY, OY);
+		glm::vec3 sunPos = glm::rotate(sun->GetSunPosition(), RotateY, OY);
 		glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sunPos[0]);
 		glUniform3fv(program->GetUniformLocation("lightColor"), 1, &sun->GetSunColor()[0]);
 		glm::mat4 mvp = glm::translate(camera.GetCameraMatrix(), Position);

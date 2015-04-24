@@ -21,6 +21,9 @@ Level::Level(const std::string &fileName) : nCols(0), nRows(0), levelData(nullpt
 
 	printf("Uploaded %s map!\n", fileName.c_str());
 
+	//calculate cos meridian
+	cosMeridian = cos(yllcorner*PI/180);
+
 	computeMaxMinHeight();
 }
 
@@ -29,27 +32,35 @@ Level::~Level(void)
 	delete[] levelData;
 }
 
-double Level::GetHeight(glm::vec2 point2d)
+const float Level::GetHeight(glm::vec2 point2d) const
 {
-	double cosMeridian = cos(yllcorner*3.14/180);
+	point2d.x = point2d.x / CELL_SIZE / cosMeridian;
+	point2d.y = point2d.y / CELL_SIZE;
 
-	int posx1 = (int)(point2d.x / CELL_SIZE / cosMeridian);
+	int posx1 = (int)point2d.x;
 	int posx2 = posx1 + 1;
-	int posy1 = (int)(point2d.y / CELL_SIZE);
+	int posy1 = (int)point2d.y;
 	int posy2 = posy1 + 1;
 
-	double f00 = levelData[posy1*nCols + posx1];
-	double f10 = levelData[posy1*nCols + posx2];
-	double f11 = levelData[posy2*nCols + posx2];
-	double f01 = levelData[posy2*nCols + posx1];
+	//build points
+	glm::vec3 p1((float)posx1, levelData[posy1*nCols + posx1], (float)posy1);
+	glm::vec3 p2((float)posx1, levelData[posy2*nCols + posx1], (float)posy2);
+	glm::vec3 p3((float)posx2, levelData[posy2*nCols + posx2], (float)posy2);
+	glm::vec3 p4((float)posx2, levelData[posy1*nCols + posx2], (float)posy1);
+	
+	//verify in what triangle is the point, the upper or the lower
+	if(glm::distance(glm::vec2(p2.x, p2.z), point2d) > glm::distance(glm::vec2(p4.x, p4.z), point2d))
+		p2 = p4;
 
-	double px = point2d.x / CELL_SIZE /cosMeridian - posx1;
-	double py = point2d.y / CELL_SIZE - posy1;
+	//calculate height based on Barycentric coordinates
+	//see:http://en.wikipedia.org/wiki/Barycentric_coordinate_system 
+	float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
 
-	double fFinal = f00 * (1.0 - px) * (1.0 - py) +
-		f10 * px * (1.0 - py) + f01 * (1.0 - px) * py + f11 * px * py;
+	float l1 = ((p2.z - p3.z) * (point2d.x - p3.x) + (p3.x - p2.x) * (point2d.y - p3.z)) / det;
+	float l2 = ((p3.z - p1.z) * (point2d.x - p3.x) + (p1.x - p3.x) * (point2d.y - p3.z)) / det;
+	float l3 = 1.0f - l1 - l2;
 
-	return fFinal;
+	return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 }
 
 void Level::computeMaxMinHeight()

@@ -14,6 +14,10 @@ uniform float minHeight;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 
+float ambientLight = 0.05;
+const float minLight = -0.2;
+const float maxLight = 0.1;
+
 void main()
 {
 	float interval = maxHeight - minHeight;
@@ -52,9 +56,11 @@ void main()
 	else vTexColor = texture2D(mySampler2, fragmentUV); 
 
 	//float dist = length(lightPos - fragmentPosition);
-	vec3 lightVector = normalize(lightPos - fragmentPosition);
-	float diffuse = max(0.1, dot(fragmentNormal, lightVector));
-	//atenuate light
-	//diffuse = diffuse * (1.0 / (1.0 + 0.00001*dist*dist));
+	vec3 lightVector = normalize(lightPos);
+	
+	float attenuation = (clamp(lightVector.y, minLight, maxLight)-minLight) / (maxLight - minLight);
+	
+	float diffuse = max(ambientLight, dot(fragmentNormal, lightVector)*attenuation);
+	
 	gl_FragColor = vTexColor * vec4(lightColor*diffuse, 1.0);
 }
