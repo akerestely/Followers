@@ -2,6 +2,8 @@
 #include <gl/glew.h>
 #include <math.h>
 
+#define NUM_BONES_PER_VEREX 4
+
 namespace Engine
 {
 	struct Position
@@ -96,9 +98,61 @@ namespace Engine
 		}
 	};
 
+	struct BoneData
+	{
+		unsigned int ids[NUM_BONES_PER_VEREX];
+		float weights[NUM_BONES_PER_VEREX];
+		
+		BoneData()
+		{
+			for (unsigned int i=0; i < NUM_BONES_PER_VEREX; i++)
+				weights[i] = ids[i] = 0;
+		}
+
+		void Add(unsigned int boneId, float weight)
+		{
+			for (unsigned int i = 0 ; i < NUM_BONES_PER_VEREX ; i++) 
+				if (weights[i] == 0.0)
+				{
+					ids[i] = boneId;
+					weights[i] = weight;
+					return;
+				}        
+		}
+	};
+
 	// Vertex, containing position, normal, uv coordinates
 	struct Vertex
 	{
+		Position position;
+		Position normal;
+		UV uv;
+
+		void SetPosition(float x, float y, float z)
+		{
+			position.x=x;
+			position.y=y;
+			position.z=z;
+		}
+
+		void SetNormal(float x, float y, float z)
+		{
+			normal.x=x;
+			normal.y=y;
+			normal.z=z;
+		}
+
+		void SetUV(float u, float v)
+		{
+			uv.u=u;
+			uv.v=v;
+		}
+	};
+
+	// Vertex, containing bone data
+	struct BonedVertex
+	{
+		BoneData boneData;
 		Position position;
 		Position normal;
 		UV uv;

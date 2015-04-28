@@ -42,16 +42,14 @@ void MainGame::initSystems()
 
 	fpsLimiter.Init(maxFps);
 
-	l=new Level("Resources/Map/imgn45w114_1");
-	levelRenderer = new LevelRenderer(l);
+	level=new Level("Resources/Map/imgn45w114_1");
+	levelRenderer = new LevelRenderer(level);
+	modelManager = new ModelManager(level);
 
-	//remove
 	sky = new Engine::SkyDome;
 	sun = new Engine::Sun(screenWidth, screenHeight);
 	water = new Engine::Water;
-	m = Engine::ModelLoader::LoadAssimp("Resources/Models/Grass/grass_01.obj");
-	//m = Engine::ModelLoader::LoadAssimp("Resources/Models/Boy/boy.lwo");
-	//
+
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClearDepth(1.0);
 	glDepthMask(GL_TRUE);
@@ -72,7 +70,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		//std::cout<<fps<<'\n';
+		std::cout<<fps<<'\n';
 	}
 }
 
@@ -149,9 +147,9 @@ void MainGame::processInput()
 		camera.Move(glm::vec3(0.0f, -CAMERA_SPEED, 0.0f));
 
 	if(inputManager.IsKeyDown(SDLK_UP))
-		sun->Update(camera, 0.1f);
+		sun->Update(camera, 0.3f);
 	if(inputManager.IsKeyDown(SDLK_DOWN))
-		sun->Update(camera, -0.1f);
+		sun->Update(camera, -0.3f);
 
 	if(SDL_GetRelativeMouseMode() == SDL_TRUE)
 	{
@@ -182,7 +180,7 @@ void MainGame::processInput()
 		printf("Coordinates in object space: %f, %f, %f\n",
 			objcoord.x, objcoord.y, objcoord.z);
 
-		movement = objcoord;
+		//movement = objcoord;
 	}
 }
 
@@ -200,7 +198,7 @@ void MainGame::renderScene()
 	sky->Render(camera, sun->GetSunPosition());
 	levelRenderer->Render(camera, sun);
 	
-	m->Render(camera, sun);
+	modelManager->Render(camera, sun);
 
 	water->Render(camera, time);
 	//Sun must be rendered last for the depth test to be good

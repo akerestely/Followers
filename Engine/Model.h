@@ -1,34 +1,43 @@
 #pragma once
 
-#include "Mesh.h"
-
 #include <vector>
+#include <map>
+#include <string>
+
 #include "GLSLProgram.h"
 #include "CameraSpectator.h"
 #include "Sun.h"
 
 namespace Engine
 {
+	struct Mesh
+	{
+		unsigned int nIndices;
+		unsigned int baseVertex;
+		unsigned int baseIndex;
+		unsigned int materialIndex;
+	};
+
 	class Model
 	{
-		friend class ModelLoader;
-
 	public:
+		friend class ModelLoader;
 		Model(void);
-		~Model(void);
+		virtual ~Model(void);
 
-		void Render(const CameraSpectator &camera, const Sun *sun);
+		virtual void Update(float time);
+		virtual void Render(const CameraSpectator &camera, const Sun *sun);
 
 		//public variables
 		float RotateY;
 		glm::vec3 Position;
-	private:
-		void initShader();
+	protected:
+		virtual void initShader();
 
 		std::vector<Mesh> meshes;
 		std::vector<int> materials;
 		GLSLProgram *program;
+		unsigned int vboId, iboId;
 	};
 }
-
 

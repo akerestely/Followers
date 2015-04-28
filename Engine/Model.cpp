@@ -1,14 +1,16 @@
 #include "Model.h"
+
 #include "Vertex.h"
 
 #include <stddef.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
-const  glm::vec3 OY(0.0f, 1.0f, 0.0f);
-
 namespace Engine
 {
+	const  glm::vec3 OY(0.0f, 1.0f, 0.0f);
+
 	Model::Model(void) : program(nullptr), Position(glm::vec3(0.0)), RotateY(0)
 	{
 		//empty
@@ -18,6 +20,11 @@ namespace Engine
 	{
 		if(program)
 			delete program;
+	}
+
+	void Model::Update(float time)
+	{
+		//empty
 	}
 
 	void Model::Render(const CameraSpectator &camera, const Sun *sun)
@@ -32,20 +39,18 @@ namespace Engine
 		mvp = glm::rotate(mvp, RotateY, OY);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
+		glBindBuffer(GL_ARRAY_BUFFER, vboId);
+		glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
+		glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+
 		glActiveTexture(GL_TEXTURE0);
 		for (auto it = meshes.begin(); it != meshes.end(); ++it)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, it->vboId);
-			glVertexAttribPointer(0, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,position));
-			glVertexAttribPointer(1, 3, GL_FLOAT ,GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,normal));
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, it->iboId);
-			int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-			
-			glBindTexture(GL_TEXTURE_2D, materials[it->materialId]);
-
-			glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
+		{			
+			glBindTexture(GL_TEXTURE_2D, materials[it->materialIndex]);
+			glDrawElements(GL_TRIANGLES, it->nIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * it->baseIndex));
 		}
 		program->UnUse();
 	}
@@ -61,4 +66,3 @@ namespace Engine
 		program->LinkShader();
 	}
 }
-

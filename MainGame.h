@@ -12,10 +12,7 @@
 
 #include "Level.h"
 #include "LevelRenderer.h"
-
-//remove
-#include "Engine/Model.h"
-//
+#include "ModelManager.h"
 
 enum GameState {PLAY,EXIT}; 
 
@@ -45,15 +42,14 @@ private:
 	float maxFps;
 	float fps;
 
-	Level *l;
+	Level *level;
 	LevelRenderer *levelRenderer;
+	ModelManager *modelManager;
 	Engine::SkyDome *sky;
 	Engine::Sun *sun;
 	Engine::Water *water;
-	Engine::Model *m;
 
 	//remove
-	glm::vec3 movement;
 	float time;
 	//
 };
