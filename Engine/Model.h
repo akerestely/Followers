@@ -31,8 +31,10 @@ namespace Engine
 		//public variables
 		float RotateY;
 		glm::vec3 Position;
+		float Scale;
 	protected:
 		virtual void initShader();
+		glm::mat4 computeModelMatrix();
 
 		std::vector<Mesh> meshes;
 		std::vector<int> materials;

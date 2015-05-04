@@ -64,7 +64,6 @@ namespace Engine
 					vertices[iVertex].SetPosition(pos->x, pos->z, pos->y);
 				else
 					vertices[iVertex].SetPosition(pos->x, pos->y, pos->z);
-				vertices[iVertex].position = vertices[iVertex].position * 100;
 				vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
 				vertices[iVertex].SetUV(uv->x, uv->y);
 			}

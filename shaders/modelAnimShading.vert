@@ -13,7 +13,6 @@ varying vec2 fragmentUV;
 const int MAX_BONES = 100;
 
 uniform mat4 M;
-uniform mat4 MV;
 uniform mat4 MVP;
 
 uniform mat4 gBones[MAX_BONES];
@@ -27,7 +26,7 @@ void main()
 
 	vec4 pos = boneTransform * vec4(vertexPosition, 1.0);
 	
-	fragmentPosition = pos.xyz;
+	fragmentPosition = (M * pos).xyz;
 	fragmentNormal = (boneTransform * vec4(vertexNormal, 0.0)).xyz;
 	fragmentUV = vec2(vertexUV.x, 1.0 - vertexUV.y);
 

@@ -32,11 +32,12 @@ namespace Engine
 		if(!program)
 			initShader();
 		program->Use();
-		glm::vec3 sunPos = glm::rotate(sun->GetSunPosition(), RotateY, OY);
+		glm::vec3 sunPos = glm::rotate(sun->GetSunPosition(), -RotateY, OY);
 		glUniform3fv(program->GetUniformLocation("lightPos"), 1, &sunPos[0]);
 		glUniform3fv(program->GetUniformLocation("lightColor"), 1, &sun->GetSunColor()[0]);
-		glm::mat4 mvp = glm::translate(camera.GetCameraMatrix(), Position);
-		mvp = glm::rotate(mvp, RotateY, OY);
+		glm::mat4 m = computeModelMatrix();
+		glm::mat4 mvp = camera.GetCameraMatrix() * m;
+		//glUniformMatrix4fv(program->GetUniformLocation("M"), 1, GL_FALSE, &m[0][0]);
 		glUniformMatrix4fv(program->GetUniformLocation("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboId);

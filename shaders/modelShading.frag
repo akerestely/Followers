@@ -9,7 +9,8 @@ uniform sampler2D mySampler;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 
-const float ambientLight = 0.05;
+const float ambientLight = 0.20;
+const float ambientLightMin = 0.05;
 const float minLight = -0.2;
 const float maxLight = 0.1;
 
@@ -24,7 +25,7 @@ void main()
 	vec3 lightVector = normalize(lightPos);
 	float attenuation = (clamp(lightVector.y, minLight, maxLight)-minLight) / (maxLight - minLight);
 
-	float diffuse = max(ambientLight, dot(fragmentNormal, lightVector)*attenuation);
+	float diffuse = max(ambientLight, dot(normalize(fragmentNormal), lightVector)) * max(ambientLightMin, attenuation);
 	
 	gl_FragColor = textureColor * vec4(lightColor*diffuse, 1.0);
 }
