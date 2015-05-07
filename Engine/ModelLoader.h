@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vertex.h"
 #include "AnimModel.h"
 
 namespace Engine
@@ -7,14 +8,13 @@ namespace Engine
 	class ModelLoader
 	{
 	public:
-		static AnimModel* LoadAnimModelAssimp(char* filePath);
 		static Model* LoadModelAssimp(char* filePath);
-	private:
-		static void loadMaterials(Model *model, const aiScene *scene, const char* filePath);
+		static Model* LoadModelRawAssimp(char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices);
+		static AnimModel* LoadAnimModelAssimp(char* filePath);
 
 		//load vertex an indices data to GPU, and bind the ids to model
 		template <class vertex_type>
-		static void uploadData(Model *model, std::vector<vertex_type> &vertices, std::vector<unsigned int> &indices)
+		static void UploadData(Model *model, std::vector<vertex_type> &vertices, std::vector<unsigned int> &indices)
 		{
 			glGenBuffers(1, &model->vboId);
 			glBindBuffer(GL_ARRAY_BUFFER, model->vboId);
@@ -24,5 +24,8 @@ namespace Engine
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->iboId);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
 		}
+
+	private:
+		static void loadMaterials(Model *model, const aiScene *scene, const char* filePath);
 	};
 }

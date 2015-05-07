@@ -68,11 +68,11 @@ namespace Engine
 
 	glm::mat4 Model::computeModelMatrix()
 	{
-		glm::mat4 mv;
-		mv = glm::translate(mv, Position);
-		mv = glm::rotate(mv, RotateY, OY);
-		mv = glm::scale(mv, glm::vec3(Scale));
-		return mv;
+		glm::mat4 m;
+		m = glm::translate(m, Position);
+		m = glm::rotate(m, RotateY, OY);
+		m = glm::scale(m, glm::vec3(Scale));
+		return m;
 	}
 
 }

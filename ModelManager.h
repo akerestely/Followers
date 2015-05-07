@@ -17,6 +17,7 @@ private:
 		glm::vec3 position;
 	};
 	std::vector<Engine::Model*> models;
+	std::vector<Engine::Model*> particleModels;
 	std::vector<ModelElement> modelElements;
 };
 

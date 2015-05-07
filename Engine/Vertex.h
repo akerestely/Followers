@@ -44,6 +44,13 @@ namespace Engine
 			p.z/=d;
 			return p;
 		}
+		Position operator += (Position p)
+		{
+			this->x += p.x;
+			this->y += p.y;
+			this->z += p.z;
+			return *this;
+		}
 		Position& operator /= (const float d)
 		{
 			this->x/=d;

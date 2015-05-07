@@ -1,6 +1,5 @@
 #include "ModelLoader.h"
 
-#include "Vertex.h"
 #include "Errors.h"
 #include "IOManager.h"
 #include "ResourceMngr.h"
@@ -77,7 +76,76 @@ namespace Engine
 			}
 		}
 
-		uploadData(model, vertices, indices);
+		UploadData(model, vertices, indices);
+		loadMaterials(model, scene, filePath);
+
+		return model;
+	}
+
+	Model* ModelLoader::LoadModelRawAssimp(char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices)
+	{
+		Model* model = new Model;
+
+		Assimp::Importer importer;
+		importer.SetPropertyInteger(AI_CONFIG_PP_LBW_MAX_WEIGHTS, NUM_BONES_PER_VEREX);
+		const aiScene *scene = importer.ReadFile(filePath, 
+			aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+		if(!scene)
+			fatalError("Error parsing'" + std::string(filePath) + "': " +std::string(importer.GetErrorString()));
+
+		model->meshes.resize(scene->mNumMeshes);
+
+		//initialize meshes from model
+		unsigned int nVertex=0, nIndices=0;
+		for (unsigned int i=0; i<scene->mNumMeshes; i++)
+		{
+			model->meshes[i].materialIndex = scene->mMeshes[i]->mMaterialIndex;
+			model->meshes[i].nIndices = scene->mMeshes[i]->mNumFaces * 3;  // *3 because, faces are triangles
+			model->meshes[i].baseIndex = nIndices;
+			model->meshes[i].nVertices = scene->mMeshes[i]->mNumVertices;
+			model->meshes[i].baseVertex = nVertex;
+
+			nIndices += model->meshes[i].nIndices;
+			nVertex += model->meshes[i].nVertices;
+		}
+
+		//array containing the vertices; will be used to generate the vbo
+		vertices.resize(nVertex);
+		//array containing the face indices; will be used to generate ibo
+		indices.resize(nIndices);
+
+		//iterate meshes from scene
+		for (unsigned int iMesh=0, iVertex=0, iIndices=0; iMesh<scene->mNumMeshes; iMesh++)
+		{
+			aiMesh* mesh = scene->mMeshes[iMesh];
+
+			//constant vec3 used to default normals or texture coordinates where missing
+			const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+			//iterate threw the mesh vertices and construct our vertices
+			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds");
+			for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++, iVertex++) {
+				const aiVector3D* pos = &(mesh->mVertices[i]);
+				const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &Zero3D;
+				const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
+
+				if(flipYwithZ)
+					vertices[iVertex].SetPosition(pos->x, pos->z, pos->y);
+				else
+					vertices[iVertex].SetPosition(pos->x, pos->y, pos->z);
+				vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
+				vertices[iVertex].SetUV(uv->x, uv->y);
+			}
+
+			for (unsigned int i=0; i<mesh->mNumFaces; i++)
+			{
+				const aiFace& face = mesh->mFaces[i];
+				indices[iIndices++] = face.mIndices[0] + model->meshes[iMesh].baseIndex;
+				indices[iIndices++] = face.mIndices[1] + model->meshes[iMesh].baseIndex;
+				indices[iIndices++] = face.mIndices[2] + model->meshes[iMesh].baseIndex;
+			}
+		}
+
 		loadMaterials(model, scene, filePath);
 
 		return model;
@@ -169,7 +237,7 @@ namespace Engine
 			}
 		}
 
-		uploadData(model, vertices, indices);
+		UploadData(model, vertices, indices);
 		loadMaterials(model, model->scene, filePath);
 
 		return model;

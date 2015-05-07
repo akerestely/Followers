@@ -98,6 +98,7 @@
     <ClCompile Include="AnimModel.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="picoPNG.cpp" />
     <ClCompile Include="ResourceMngr.cpp" />
     <ClCompile Include="SkyDome.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="AnimModel.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="picoPNG.h" />
     <ClInclude Include="ResourceMngr.h" />
     <ClInclude Include="SkyDome.h" />

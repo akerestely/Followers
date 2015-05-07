@@ -12,9 +12,10 @@ namespace Engine
 {
 	struct Mesh
 	{
+		unsigned int baseIndex;
 		unsigned int nIndices;
 		unsigned int baseVertex;
-		unsigned int baseIndex;
+		unsigned int nVertices;
 		unsigned int materialIndex;
 	};
 
@@ -22,6 +23,7 @@ namespace Engine
 	{
 	public:
 		friend class ModelLoader;
+		friend class ParticleSystem;
 		Model(void);
 		virtual ~Model(void);
 
