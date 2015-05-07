@@ -99,7 +99,9 @@ namespace Engine
 		glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, texIdColor[1]);
 		radialBlurProgram->Use();
 		glUniform2f(radialBlurProgram->GetUniformLocation("sourcePos"), biassedPosition.x, biassedPosition.y);
+		glDisable(GL_DEPTH_TEST);
 		renderRect();		
+		glDisable(GL_DEPTH_TEST);
 		radialBlurProgram->UnUse();
 		glDisable(GL_BLEND);
 	}
