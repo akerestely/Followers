@@ -1,29 +1,22 @@
 #include "ModelManager.h"
 
 #include "Engine/ParticleSystem.h"
+#include "Engine/Errors.h"
 
 #include <ctime>
+#include <fstream>
+#include <unordered_map>
 
-ModelManager::ModelManager(const Level *level)
+struct ModelInfo
 {
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/Grass/grass_01.obj"));
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/Boy/boy.lwo"));
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/Farmhouse/Farmhouse OBJ.obj"));
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/GrassPack/grass01.3ds"));
-	models[models.size()-1]->Scale = 50;
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/GrassPack/grass02.3ds"));
-	models[models.size()-1]->Scale = 50;
+	unsigned int type;
+	std::string path;
+};
 
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/GrassPack/grass03.3ds"));
-	models[models.size()-1]->Scale = 50;
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/TreePack/tree01.3ds"));
-	models[models.size()-1]->Scale = 300;
-	models.push_back(Engine::ModelLoader::LoadModelAssimp("Resources/Models/TreePack/tree02.3ds"));
-	models[models.size()-1]->Scale = 300;
-	//models.push_back(Engine::ModelLoader::LoadAnimModelAssimp("Resources/Models/boblamp/boblampclean.md5mesh"));
-	models.push_back(Engine::ModelLoader::LoadAnimModelAssimp("Resources/Models/windmill.dae"));
-	models[models.size()-1]->Scale = 50;
-
+ModelManager::ModelManager(const Level *level) : crtModelElement(-1)
+{
+	this->level = level;
+	load();
 	
 	std::vector<Engine::ParticleSystem *> particleSystems;
 	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/GrassPack/grass01.3ds"));
@@ -44,11 +37,6 @@ ModelManager::ModelManager(const Level *level)
 			{
 				if(rand()%100 > 50)
 					continue;
-// 				ModelElement me;
-// 				me.model = models[3 + rand()%1];
-// 				me.position = glm::vec3(j * cosMeridian * CELL_SIZE, level->GetHeight(glm::vec2(j * cosMeridian * CELL_SIZE,i*CELL_SIZE)) , i*CELL_SIZE);
-// 				me.rotationY = rand() % 360;
-// 				modelElements.push_back(me);
 				unsigned int type = rand() % 5;
 				glm::vec3 position(j * cosMeridian * CELL_SIZE, level->GetHeight(glm::vec2(j * cosMeridian * CELL_SIZE,i*CELL_SIZE)) , i*CELL_SIZE);
 				float rotationY = rand() % 360;
@@ -72,15 +60,7 @@ ModelManager::ModelManager(const Level *level)
 	for(auto it = particleSystems.begin(); it != particleSystems.end(); it++)
 		particleModels.push_back((*it)->Finalize());
 
-	ModelElement me;
-	me.model = models[8];
-	float x = 0 * cosMeridian * CELL_SIZE;
-	//float h = levelData[100*level->GetCols() + 50];
-	float z = 0*CELL_SIZE;
-	me.position = glm::vec3(x, level->GetHeight(glm::vec2(x,z)), z);
-	//me.rotationY = rand() % 360;
-	modelElements.push_back(me);
-	printf("Number of models in memory: %d \n", modelElements.size());
+	NewModel();
 }
 
 ModelManager::~ModelManager(void)
@@ -92,20 +72,123 @@ ModelManager::~ModelManager(void)
 void ModelManager::Render(const Engine::CameraSpectator &camera, const Engine::Sun *sun)
 {
 	static float time = 0;
-	int count = 0;
-	models[8]->Update(time);
 	for (auto it = modelElements.begin(); it<modelElements.end(); it++)
 	{
-		if(glm::length(-camera.GetPosition() - it->position) < 100*CELL_SIZE)
-		{
-			it->model->Position = it->position;
-			it->model->RotateY = it->rotationY;
-			it->model->Render(camera, sun);
-			count++;
-		}
+		it->model->Update(time);
+		it->model->Position = it->position;
+		it->model->RotateY = it->rotationY;
+		it->model->Scale = it->scale;
+		it->model->Render(camera, sun);
 	}
+	//render particles
 	for(auto it = particleModels.begin(); it != particleModels.end(); it++)
 		(*it)->Render(camera, sun);
 	time++;
-	//printf("%d models rendered \n", count);
+}
+
+void ModelManager::NextModel()
+{
+	crtSel = (crtSel+1) % models.size();
+	modelElements[crtModelElement].model = models[crtSel];
+	modelElements[crtModelElement].selection = crtSel;
+}
+
+void ModelManager::NewModel()
+{
+	modelElements.push_back(ModelElement());
+	crtSel = 0;
+	crtModelElement++;
+
+	if (modelElements.size() == 1)
+		modelElements[crtModelElement].model = models[0];
+	else
+	{
+		modelElements[crtModelElement].model = modelElements[crtModelElement-1].model;
+		modelElements[crtModelElement].position = modelElements[crtModelElement-1].position;
+		modelElements[crtModelElement].rotationY = modelElements[crtModelElement-1].rotationY;
+		modelElements[crtModelElement].scale = modelElements[crtModelElement-1].scale;
+	}
+	modelElements[crtModelElement].selection = crtSel;
+}
+
+void ModelManager::Rotate(float deltaDegree)
+{
+	modelElements[crtModelElement].rotationY += deltaDegree;
+}
+
+void ModelManager::Scale(float deltaScale)
+{
+	modelElements[crtModelElement].scale += deltaScale;
+	if(modelElements[crtModelElement].scale <= 1.0)
+		modelElements[crtModelElement].scale = 1.0;
+}
+
+void ModelManager::Position(float x, float z)
+{
+	 Position(x, level->GetHeight(glm::vec2(x,z)), z);
+}
+
+void ModelManager::Position(float x, float y, float z)
+{
+	modelElements[crtModelElement].position = glm::vec3(x, y, z);
+}
+
+void ModelManager::Height(float deltaHeight)
+{
+	modelElements[crtModelElement].position.y += deltaHeight;
+}
+
+void ModelManager::Save()
+{
+	std::ofstream file("Resources/Map/modelElements",std::ios::binary);
+	if(file.fail())
+		Engine::fatalError("File could not be opened!");
+
+	unsigned int nElements = modelElements.size();
+	file.write((char*)&nElements, sizeof(nElements));
+	file.write((char*)&modelElements[0], sizeof(modelElements[0])*nElements);
+}
+
+void ModelManager::load()
+{
+	std::ifstream file("Resources/Map/models");
+	if(file.fail())
+		Engine::fatalError("File could not be opened!");
+
+	std::unordered_map<unsigned int, ModelInfo> modelPaths;
+
+	unsigned int id;
+	ModelInfo mi;
+
+	while (!file.eof())
+	{
+		file>>id>>mi.type;
+		std::getline(file, mi.path);
+		//remove first character
+		mi.path.erase(0,1);
+		modelPaths[id] = mi;
+	}
+
+	models.resize(modelPaths.size());
+	for(auto it = modelPaths.begin(); it != modelPaths.end(); it++)
+		if (it->second.type == 1)
+			models[it->first] = Engine::ModelLoader::LoadModelAssimp(it->second.path.c_str());
+		else if (it->second.type == 2)
+			models[it->first] = Engine::ModelLoader::LoadAnimModelAssimp(it->second.path.c_str());
+	file.close();
+
+	//load saved Model Elements
+	file.open("Resources/Map/modelElements",std::ios::binary);
+	if(file.fail())
+		return;
+	unsigned int nElements;
+	file.read((char*)&nElements,sizeof(nElements));
+	
+	modelElements.resize(nElements);
+	file.read((char*)&modelElements[0], sizeof(modelElements[0])*nElements);
+
+	crtModelElement = nElements-1;
+
+	for (auto it=modelElements.begin(); it != modelElements.end(); it++)
+		it->model = models[it->selection];
 }

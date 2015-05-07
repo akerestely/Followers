@@ -12,7 +12,7 @@
 
 namespace Engine
 {
-	Model* ModelLoader::LoadModelAssimp(char* filePath)
+	Model* ModelLoader::LoadModelAssimp(const char* filePath)
 	{
 		Model* model = new Model;
 
@@ -52,18 +52,23 @@ namespace Engine
 			const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 			//iterate threw the mesh vertices and construct our vertices
-			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds");// || 
-			//IOManager::GetFileExtension(filePath) == std::string(".md5mesh");
+			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds") || 
+			IOManager::GetFileExtension(filePath) == std::string(".dae");
 			for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++, iVertex++) {
 				const aiVector3D* pos = &(mesh->mVertices[i]);
 				const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &Zero3D;
 				const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 
 				if(flipYwithZ)
+				{
 					vertices[iVertex].SetPosition(pos->x, pos->z, pos->y);
+					vertices[iVertex].SetNormal(normal->x, normal->z, normal->y);
+				}
 				else
+				{
 					vertices[iVertex].SetPosition(pos->x, pos->y, pos->z);
-				vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
+					vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
+				}
 				vertices[iVertex].SetUV(uv->x, uv->y);
 			}
 
@@ -82,7 +87,7 @@ namespace Engine
 		return model;
 	}
 
-	Model* ModelLoader::LoadModelRawAssimp(char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices)
+	Model* ModelLoader::LoadModelRawAssimp(const char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices)
 	{
 		Model* model = new Model;
 
@@ -123,17 +128,23 @@ namespace Engine
 			const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 			//iterate threw the mesh vertices and construct our vertices
-			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds");
+			bool flipYwithZ = IOManager::GetFileExtension(filePath) == std::string(".3ds") || 
+				IOManager::GetFileExtension(filePath) == std::string(".dae");
 			for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++, iVertex++) {
 				const aiVector3D* pos = &(mesh->mVertices[i]);
 				const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &Zero3D;
 				const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 
 				if(flipYwithZ)
+				{
 					vertices[iVertex].SetPosition(pos->x, pos->z, pos->y);
+					vertices[iVertex].SetNormal(normal->x, normal->z, normal->y);
+				}
 				else
+				{
 					vertices[iVertex].SetPosition(pos->x, pos->y, pos->z);
-				vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
+					vertices[iVertex].SetNormal(normal->x, normal->y, normal->z);
+				}
 				vertices[iVertex].SetUV(uv->x, uv->y);
 			}
 
@@ -151,7 +162,7 @@ namespace Engine
 		return model;
 	}
 
-	AnimModel* ModelLoader::LoadAnimModelAssimp(char* filePath)
+	AnimModel* ModelLoader::LoadAnimModelAssimp(const char* filePath)
 	{
 		//Model containing all the data
 		AnimModel* model = new AnimModel;

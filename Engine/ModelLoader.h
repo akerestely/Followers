@@ -8,9 +8,9 @@ namespace Engine
 	class ModelLoader
 	{
 	public:
-		static Model* LoadModelAssimp(char* filePath);
-		static Model* LoadModelRawAssimp(char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices);
-		static AnimModel* LoadAnimModelAssimp(char* filePath);
+		static Model* LoadModelAssimp(const char* filePath);
+		static Model* LoadModelRawAssimp(const char* filePath, std::vector<Vertex> &vertices, std::vector<unsigned int> &indices);
+		static AnimModel* LoadAnimModelAssimp(const char* filePath);
 
 		//load vertex an indices data to GPU, and bind the ids to model
 		template <class vertex_type>

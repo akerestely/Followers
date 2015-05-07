@@ -22,6 +22,8 @@ namespace Engine
 
 	void ParticleSystem::Add(glm::vec3 &position, float &rotateY, float &scale)
 	{
+		//bring down on y, to cover eventual fails
+		position.y -= 5;
 		glm::mat4 modelMatrix;
 		modelMatrix = glm::translate(modelMatrix, position);
 		modelMatrix = glm::rotate(modelMatrix, rotateY, OY);
@@ -60,7 +62,7 @@ namespace Engine
 		}
 
 		ModelLoader::UploadData(model, finalVertices, finalIndices);
-		printf("Particle with: %d components!", transforms.size());
+		printf("Particle with: %d components!\n", transforms.size());
 		return model;
 	}
 

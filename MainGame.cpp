@@ -70,7 +70,7 @@ void MainGame::gameLoop()
 		renderScene();
 
 		fps = fpsLimiter.End();
-		std::cout<<fps<<'\n';
+		std::cout<<"FPS: "<<fps<<'\n';
 	}
 }
 
@@ -157,7 +157,7 @@ void MainGame::processInput()
 		glm::vec2 mouseCoords = inputManager.GetMouseCoordsRel();
 		camera.Rotate(glm::vec3(mouseCoords.y*MOUSE_SENSITIVITY, mouseCoords.x*MOUSE_SENSITIVITY,0.0f));
 	}
-	if(inputManager.IsKeyDown(SDL_BUTTON_LEFT))
+	if(inputManager.IsKeyDownOnce(SDL_BUTTON_LEFT))
 	{
 		int x = inputManager.GetMouseCoords().x;
 		int y = inputManager.GetMouseCoords().y;
@@ -180,8 +180,38 @@ void MainGame::processInput()
 		printf("Coordinates in object space: %f, %f, %f\n",
 			objcoord.x, objcoord.y, objcoord.z);
 
-		//movement = objcoord;
+		modelManager->Position(objcoord.x, objcoord.y, objcoord.z);
 	}
+	if (inputManager.IsKeyDown(SDLK_h))
+	{
+		if(inputManager.IsKeyDown(SDLK_RIGHTBRACKET))
+			modelManager->Height(CAMERA_SPEED);
+		if(inputManager.IsKeyDown(SDLK_LEFTBRACKET))
+			modelManager->Height(-CAMERA_SPEED);
+	}
+	if (inputManager.IsKeyDown(SDLK_x))
+	{
+		if(inputManager.IsKeyDown(SDLK_RIGHTBRACKET))
+			modelManager->Scale(CAMERA_SPEED);
+		if(inputManager.IsKeyDown(SDLK_LEFTBRACKET))
+			modelManager->Scale(-CAMERA_SPEED);
+	}
+	if (inputManager.IsKeyDown(SDLK_r))
+	{
+		if(inputManager.IsKeyDown(SDLK_RIGHTBRACKET))
+			modelManager->Rotate(CAMERA_SPEED);
+		if(inputManager.IsKeyDown(SDLK_LEFTBRACKET))
+			modelManager->Rotate(-CAMERA_SPEED);
+	}
+	if (inputManager.IsKeyDownOnce(SDLK_COMMA))
+		modelManager->NextModel();
+	if (inputManager.IsKeyDownOnce(SDLK_PERIOD))
+		modelManager->NewModel();
+
+	if (inputManager.IsKeyDown(SDLK_LCTRL))
+		if (inputManager.IsKeyDownOnce(SDLK_s))
+			modelManager->Save();
+	
 }
 
 void MainGame::update()

@@ -100,7 +100,7 @@ namespace Engine
 		radialBlurProgram->Use();
 		glUniform2f(radialBlurProgram->GetUniformLocation("sourcePos"), biassedPosition.x, biassedPosition.y);
 		glDisable(GL_DEPTH_TEST);
-		renderRect();		
+		renderRect();
 		glDisable(GL_DEPTH_TEST);
 		radialBlurProgram->UnUse();
 		glDisable(GL_BLEND);

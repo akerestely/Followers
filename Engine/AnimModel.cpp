@@ -72,7 +72,9 @@ namespace Engine
 	}
 
 	void AnimModel::boneTransform(float frames)
-	{
+	{	
+		if(scene->mAnimations[0]->mTicksPerSecond == 1)
+			frames /= 30;
 		float animationTime = fmod(frames, (float)scene->mAnimations[0]->mDuration);
 
 		readNodeHeirarchy(animationTime, scene->mRootNode, glm::mat4());
