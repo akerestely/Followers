@@ -24,6 +24,9 @@ ModelManager::ModelManager(const Level *level) : crtModelElement(-1)
 	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/GrassPack/grass03.3ds"));
 	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/TreePack/tree01.3ds"));
 	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/TreePack/tree02.3ds"));
+	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/Rocks/rock1.dae"));
+	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/Rocks/rock2.dae"));
+	particleSystems.push_back(new Engine::ParticleSystem("Resources/Models/Rocks/rock3.dae"));
 
 	srand(time(0));
 	//add grass
@@ -33,6 +36,16 @@ ModelManager::ModelManager(const Level *level) : crtModelElement(-1)
 		for (int j=1; j<COL-1; j++)
 		{
 			float h = levelData[i*level->GetCols() + j];
+			if(h>1700)
+			{
+				if(rand()%500 > 0)
+					continue;
+				unsigned int type = 5 + rand() % 3;
+				glm::vec3 position(j * cosMeridian * CELL_SIZE, level->GetHeight(glm::vec2(j * cosMeridian * CELL_SIZE,i*CELL_SIZE)) , i*CELL_SIZE);
+				float rotationY = rand() % 360;
+				float scale = 30;
+				particleSystems[type]->Add(position, rotationY, scale);
+			}
 			if(h>1400 && h<1700)
 			{
 				if(rand()%100 > 50)

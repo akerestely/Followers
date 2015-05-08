@@ -37,14 +37,15 @@ void MainGame::initSystems()
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	camera.Init(screenWidth,screenHeight);
-	camera.Rotate(glm::vec3(0.0f, 180.0f, 0.0f));
-	camera.Move(glm::vec3(0.0f, 2300.f, 0.0f));
 
 	fpsLimiter.Init(maxFps);
 
 	level=new Level("Resources/Map/imgn45w114_1");
 	levelRenderer = new LevelRenderer(level);
 	modelManager = new ModelManager(level);
+
+	camera.Rotate(glm::vec3(0.0f, 90.0f, 0.0f));
+	camera.Move(glm::vec3(ROW*CELL_SIZE/2, 2300.f, 0.0f));
 
 	sky = new Engine::SkyDome;
 	sun = new Engine::Sun(screenWidth, screenHeight);
@@ -215,7 +216,6 @@ void MainGame::processInput()
 		if (inputManager.IsKeyDownOnce(SDLK_LEFTBRACKET))
 			modelManager->PreviousSelection();
 	}
-	
 }
 
 void MainGame::update()
