@@ -33,7 +33,7 @@ void MainGame::initSystems()
 {
 	Engine::Init();
 
-	window.Create("Followers", screenWidth, screenHeight, /*Engine::FULLSCREEN*/ 0);
+	window.Create("Followers", screenWidth, screenHeight, Engine::FULLSCREEN);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	camera.Init(screenWidth,screenHeight);
@@ -209,8 +209,12 @@ void MainGame::processInput()
 		modelManager->NewModel();
 
 	if (inputManager.IsKeyDown(SDLK_LCTRL))
+	{
 		if (inputManager.IsKeyDownOnce(SDLK_s))
 			modelManager->Save();
+		if (inputManager.IsKeyDownOnce(SDLK_LEFTBRACKET))
+			modelManager->PreviousSelection();
+	}
 	
 }
 

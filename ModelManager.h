@@ -12,6 +12,7 @@ public:
 
  	void NextModel();
 	void NewModel();
+	void PreviousSelection();
 
  	void Rotate(float deltaDegree);
  	void Scale(float deltaScale);

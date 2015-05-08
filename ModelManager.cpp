@@ -60,7 +60,7 @@ ModelManager::ModelManager(const Level *level) : crtModelElement(-1)
 	for(auto it = particleSystems.begin(); it != particleSystems.end(); it++)
 		particleModels.push_back((*it)->Finalize());
 
-	NewModel();
+	//NewModel();
 }
 
 ModelManager::~ModelManager(void)
@@ -96,19 +96,27 @@ void ModelManager::NextModel()
 void ModelManager::NewModel()
 {
 	modelElements.push_back(ModelElement());
-	crtSel = 0;
-	crtModelElement++;
+	crtModelElement=modelElements.size()-1;
 
 	if (modelElements.size() == 1)
+	{
+		crtSel = 0;
 		modelElements[crtModelElement].model = models[0];
+	}
 	else
 	{
 		modelElements[crtModelElement].model = modelElements[crtModelElement-1].model;
 		modelElements[crtModelElement].position = modelElements[crtModelElement-1].position;
 		modelElements[crtModelElement].rotationY = modelElements[crtModelElement-1].rotationY;
 		modelElements[crtModelElement].scale = modelElements[crtModelElement-1].scale;
+		modelElements[crtModelElement].selection = modelElements[crtModelElement-1].selection;
 	}
-	modelElements[crtModelElement].selection = crtSel;
+}
+
+void ModelManager::PreviousSelection()
+{
+	crtModelElement--;
+	crtSel = modelElements[crtModelElement].selection;
 }
 
 void ModelManager::Rotate(float deltaDegree)
@@ -191,4 +199,6 @@ void ModelManager::load()
 
 	for (auto it=modelElements.begin(); it != modelElements.end(); it++)
 		it->model = models[it->selection];
+
+	crtSel = modelElements[crtModelElement].selection;
 }
