@@ -40,7 +40,7 @@ void MainGame::initSystems()
 
 	fpsLimiter.Init(maxFps);
 
-	level=new Level("Resources/Map/imgn45w114_1");
+	level=new Level("Resources/Map/imgn45w114_1_300");
 	levelRenderer = new LevelRenderer(level);
 	modelManager = new ModelManager(level);
 

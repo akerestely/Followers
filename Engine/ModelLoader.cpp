@@ -84,6 +84,8 @@ namespace Engine
 		UploadData(model, vertices, indices);
 		loadMaterials(model, scene, filePath);
 
+		printf("Model loaded: %s\n", filePath);
+
 		return model;
 	}
 
@@ -158,6 +160,8 @@ namespace Engine
 		}
 
 		loadMaterials(model, scene, filePath);
+
+		printf("Model for particle loaded: %s\n", filePath);
 
 		return model;
 	}
@@ -251,6 +255,7 @@ namespace Engine
 		UploadData(model, vertices, indices);
 		loadMaterials(model, model->scene, filePath);
 
+		printf("Animation loaded: %s\n", filePath);
 		return model;
 	}
 
