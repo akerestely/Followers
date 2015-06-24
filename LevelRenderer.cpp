@@ -37,8 +37,7 @@ void LevelRenderer::Render(const Engine::CameraSpectator &camera, const Engine::
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Engine::Vertex), (void*)offsetof(Engine::Vertex,uv));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
-	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	glDrawElements(GL_TRIANGLES, size/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, iboSize, GL_UNSIGNED_INT, 0);
 	program->UnUse();
 }
 
@@ -76,7 +75,8 @@ void LevelRenderer::buildModel(const Level *level)
 	//first and last column
 
 	//assign triangle indices. Two triangles at once, that form a rectangle.
-	unsigned int *indices = new unsigned int[(COL-1)*(ROW-1)*2*3];
+	iboSize = (COL-1)*(ROW-1)*2*3;
+	unsigned int *indices = new unsigned int[iboSize];
 	for(int i=0,k=0; i<ROW-1; i++)
 		for(int j=0; j<COL-1; j++)
 		{
@@ -98,7 +98,7 @@ void LevelRenderer::buildModel(const Level *level)
 
 	glGenBuffers(1, &iboId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*(COL-1)*(ROW-1)*2*3, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * iboSize, indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	delete[] indices;
 }

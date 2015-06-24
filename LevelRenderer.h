@@ -17,6 +17,7 @@ private:
 	void initShader(const Level *level);
 
 	unsigned int vboId, iboId;
+	unsigned int iboSize;
 
 	Engine::GLSLProgram *program;
 };
