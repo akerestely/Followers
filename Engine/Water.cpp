@@ -32,7 +32,7 @@ namespace Engine
 
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 		glEnable(GL_BLEND);
-		glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, ResourceMngr::GetTexture("Textures/water.jpg").id);
+		glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, ResourceMngr::GetTexture("Resources/Textures/water.jpg").id);
 		program->Use();
 		glUniform1f(program->GetUniformLocation("time"), deltaTime);
 		glm::vec3 negativeCamPos = glm::vec3(0.0, 1300, 0.0);

@@ -19,11 +19,11 @@ LevelRenderer::~LevelRenderer(void)
 void LevelRenderer::Render(const Engine::CameraSpectator &camera, const Engine::Sun *sun)
 {
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/sand.jpg").id);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Resources/Textures/sand.jpg").id);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/grass.png").id);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Resources/Textures/grass.png").id);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Textures/rock.jpg").id);
+	glBindTexture(GL_TEXTURE_2D, Engine::ResourceMngr::GetTexture("Resources/Textures/rock.jpg").id);
 
 	program->Use();
 	//update uniforms
