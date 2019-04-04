@@ -1,13 +1,3 @@
-# 
-# 
-newmtl grass_01
-Ns 96.078431
-Ka 0.000000 0.000000 0.000000
-Kd 0.640000 0.640000 0.640000
-Ks 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 1
-map_Kd grass_diff.tga
-
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:85a7828ae8dc1f97cbed10fe99406f55126367385985ad0aa61117d331cb5470
+size 193
