@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Followers", "Followers\Followers.vcxproj", "{DE47B051-1353-48E3-A881-A1644C4E9D1B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B84FB94B-72BE-4E25-AA49-DE78112109CD} = {B84FB94B-72BE-4E25-AA49-DE78112109CD}
