@@ -69,25 +69,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)deps\include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SoluitonDir)deps\lib;$(SoluitonDir)Debug;$(LibraryPath)</LibraryPath>
-    <ExecutablePath>$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir);$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)deps\include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SoluitonDir)deps\lib;$(SoluitonDir)Debug;$(LibraryPath)</LibraryPath>
-    <ExecutablePath>$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir);$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)deps\include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SoluitonDir)deps\lib;$(SoluitonDir)Release;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir);$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)deps\include;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SoluitonDir)deps\lib;$(SoluitonDir)Release;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir);$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,10 +102,12 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\;$(SolutionDir)ThirdParty\lib\$(Platform)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;opengl32.lib;glew32.lib;Engine.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)ThirdParty\bin\$(Platform)\* $(SolutionDir)build\bin\$(Platform)\$(Configuration)\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,10 +120,12 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\;$(SolutionDir)ThirdParty\lib\$(Platform)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;opengl32.lib;glew32.lib;Engine.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)ThirdParty\bin\$(Platform)\* $(SolutionDir)build\bin\$(Platform)\$(Configuration)\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -137,7 +143,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>SDL2.lib;opengl32.lib;glew32.lib;Engine.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\;$(SolutionDir)ThirdParty\lib\$(Platform)\</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)ThirdParty\bin\$(Platform)\* $(SolutionDir)build\bin\$(Platform)\$(Configuration)\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -155,7 +165,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>SDL2.lib;opengl32.lib;glew32.lib;Engine.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\;$(SolutionDir)ThirdParty\lib\$(Platform)\</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)ThirdParty\bin\$(Platform)\* $(SolutionDir)build\bin\$(Platform)\$(Configuration)\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Level.cpp" />
