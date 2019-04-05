@@ -5,7 +5,6 @@
 
 #include <ctime>
 #include <fstream>
-#include <unordered_map>
 
 struct ModelInfo
 {
@@ -78,20 +77,21 @@ ModelManager::ModelManager(const Level *level) : crtModelElement(-1)
 
 ModelManager::~ModelManager(void)
 {
-	for(auto it = models.begin(); it < models.end(); it++)
-		delete (*it);
+	for(auto itMap : models)
+		delete itMap.second;
 }
 
 void ModelManager::Render(const Engine::CameraSpectator &camera, const Engine::Sun *sun)
 {
 	static float time = 0;
-	for (auto it = modelElements.begin(); it<modelElements.end(); it++)
+	for (ModelElement& modelElement : modelElements)
 	{
-		it->model->Update(time);
-		it->model->Position = it->position;
-		it->model->RotateY = it->rotationY;
-		it->model->Scale = it->scale;
-		it->model->Render(camera, sun);
+		Engine::Model* model = models[modelElement.modelId];
+		model->Update(time);
+		model->Position = modelElement.position;
+		model->RotateY = modelElement.rotationY;
+		model->Scale = modelElement.scale;
+		model->Render(camera, sun);
 	}
 	//render particles
 	for(auto it = particleModels.begin(); it != particleModels.end(); it++)
@@ -102,8 +102,7 @@ void ModelManager::Render(const Engine::CameraSpectator &camera, const Engine::S
 void ModelManager::NextModel()
 {
 	crtSel = (crtSel+1) % models.size();
-	modelElements[crtModelElement].model = models[crtSel];
-	modelElements[crtModelElement].selection = crtSel;
+	modelElements[crtModelElement].modelId = crtSel;
 }
 
 void ModelManager::NewModel()
@@ -114,22 +113,21 @@ void ModelManager::NewModel()
 	if (modelElements.size() == 1)
 	{
 		crtSel = 0;
-		modelElements[crtModelElement].model = models[0];
+		modelElements[crtModelElement].modelId = models.begin()->first;
 	}
 	else
 	{
-		modelElements[crtModelElement].model = modelElements[crtModelElement-1].model;
 		modelElements[crtModelElement].position = modelElements[crtModelElement-1].position;
 		modelElements[crtModelElement].rotationY = modelElements[crtModelElement-1].rotationY;
 		modelElements[crtModelElement].scale = modelElements[crtModelElement-1].scale;
-		modelElements[crtModelElement].selection = modelElements[crtModelElement-1].selection;
+		modelElements[crtModelElement].modelId = modelElements[crtModelElement-1].modelId;
 	}
 }
 
 void ModelManager::PreviousSelection()
 {
 	crtModelElement--;
-	crtSel = modelElements[crtModelElement].selection;
+	crtSel = modelElements[crtModelElement].modelId;
 }
 
 void ModelManager::Rotate(float deltaDegree)
@@ -187,15 +185,11 @@ void ModelManager::load()
 		std::getline(file, mi.path);
 		//remove first character
 		mi.path.erase(0,1);
-		modelPaths[id] = mi;
+		if(mi.type == 1)
+			models[id] = Engine::ModelLoader::LoadModelAssimp(mi.path.c_str());
+		else if (mi.type == 2)
+			models[id] = Engine::ModelLoader::LoadAnimModelAssimp(mi.path.c_str());
 	}
-
-	models.resize(modelPaths.size());
-	for(auto it = modelPaths.begin(); it != modelPaths.end(); it++)
-		if (it->second.type == 1)
-			models[it->first] = Engine::ModelLoader::LoadModelAssimp(it->second.path.c_str());
-		else if (it->second.type == 2)
-			models[it->first] = Engine::ModelLoader::LoadAnimModelAssimp(it->second.path.c_str());
 	file.close();
 
 	//load saved Model Elements
@@ -210,8 +204,5 @@ void ModelManager::load()
 
 	crtModelElement = nElements-1;
 
-	for (auto it=modelElements.begin(); it != modelElements.end(); it++)
-		it->model = models[it->selection];
-
-	crtSel = modelElements[crtModelElement].selection;
+	crtSel = modelElements[crtModelElement].modelId;
 }

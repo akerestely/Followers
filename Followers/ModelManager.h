@@ -2,6 +2,8 @@
 #include "Engine/ModelLoader.h"
 #include "Level.h"
 
+#include <unordered_map>
+
 class ModelManager
 {
 public:
@@ -24,24 +26,19 @@ public:
 private:
 	struct ModelElement
 	{
-		Engine::Model *model;
-		float rotationY;
 		glm::vec3 position;
+		float rotationY;
 		float scale;
-		unsigned int selection;
+		unsigned int modelId;
 
-		ModelElement()
+		ModelElement() : rotationY(0.0), scale(1.0), modelId(0)
 		{
-			model = nullptr;
-			rotationY = 0.0;
-			scale = 1.0;
-			selection = 0;
 		}
 	};
 
 	void load();
 
-	std::vector<Engine::Model*> models;
+	std::unordered_map<unsigned int, Engine::Model*> models;
 	std::vector<Engine::Model*> particleModels;
 	std::vector<ModelElement> modelElements;
 
