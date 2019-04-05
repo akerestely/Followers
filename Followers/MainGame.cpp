@@ -9,8 +9,8 @@
 //
 
 MainGame::MainGame(void) :
-	screenWidth(800),
-	screenHeight(640),
+	screenWidth(1920),
+	screenHeight(1080),
 	gameState(PLAY),
 	maxFps(60)
 {
@@ -33,7 +33,8 @@ void MainGame::initSystems()
 {
 	Engine::Init();
 
-	window.Create("Followers", screenWidth, screenHeight, Engine::FULLSCREEN);
+	// caution: changing to full_screen will change internal screen width and height
+	window.Create("Followers", screenWidth, screenHeight, Engine::BORDERLESS);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	camera.Init(screenWidth,screenHeight);
